@@ -1,0 +1,6 @@
+windows:
+  - name: haskell-repl
+    layout: 182d,232x61,0,0{137x61,0,0,0,94x61,138,0,1}
+    panes:
+      - vim app/Main.hs
+      - watch "stack build && stack exec pih-exe | tail -10"
