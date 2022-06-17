@@ -6,6 +6,7 @@ import qualified Chapter4 as C4
 import qualified Chapter5 as C5
 import qualified Chapter6 as C6
 import qualified Chapter7 as C7
+import qualified Chapter8 as C8
 
 main :: IO ()
 main = do
@@ -71,11 +72,8 @@ main = do
   print (C7.luhnUsingAltMap' 1020)
   print (C7.int2dec' 102030)
   print (C7.luhnUsingAltMap' 199)
+  -- No good, very very bad function
+  -- print ((C7.findBankCards' [4600 .. 4700]))
 
--- No good, very very bad function
--- print ((C7.findBankCards' [4600 .. 4700]))
-
-{-   print (C6.take' 5 lst) -}
---
--- print (C6.zip' [0 .. 10] [0 ..])
-{-  -}
+  print (C8.nat2int' (C8.mult' (C8.int2nat' 2) (C8.int2nat' 3)))
+  print (C8.occurs' 3 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]))
