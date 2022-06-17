@@ -68,8 +68,12 @@ main = do
   print (take 5 (C7.iterate' (* 2) 1))
   print (C7.transmit' "hello functional world")
   print (C7.altMap' (+ 10) (+ 100) [0 .. 4])
-  print (C7.luhnUsingAltMap' 12350)
+  print (C7.luhnUsingAltMap' 1020)
   print (C7.int2dec' 102030)
+  print (C7.luhnUsingAltMap' 199)
+
+-- No good, very very bad function
+-- print ((C7.findBankCards' [4600 .. 4700]))
 
 {-   print (C6.take' 5 lst) -}
 --

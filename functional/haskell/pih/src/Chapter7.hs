@@ -17,6 +17,7 @@ module Chapter7
     Chapter7.luhnUsingAltMap',
     Chapter7.int2dec',
     Chapter7.numLength',
+    Chapter7.findBankCards',
   )
 where
 
@@ -61,17 +62,17 @@ nums' n = n : nums' (n `div` 10)
 numLength' :: Int -> Int
 numLength' = length . nums'
 
--- TODO: update it later to handle inputs like 10
-{- int2dec' :: Int -> Int -}
--- int2dec'n = numLength' (n `div` (10 ^ (numLength' n - 1)
-{-  -}
-
 int2dec' :: Int -> [Int]
 int2dec' 0 = []
 int2dec' 1 = [1]
 int2dec' n
-  | numLength' n - numLength' (n `mod` (10 ^ (numLength' n - 1))) > 1 = n `div` (10 ^ (numLength' n - 1)) : 0 : int2dec' (n `mod` (10 ^ (numLength' n - 1)))
-  | otherwise = n `div` (10 ^ (numLength' n - 1)) : int2dec' (n `mod` (10 ^ (numLength' n - 1)))
+  | n < 0 = error "Negative number handling not implemented"
+  | otherwise =
+    let nextpower = 10 ^ (numLength' n - 1)
+        (q, rem) = n `quotRem` nextpower
+     in if numLength' n - numLength' rem > 1
+          then q : 0 : int2dec' (n `mod` nextpower)
+          else q : int2dec' (n `mod` nextpower)
 
 -- TODO: These only deal with a pair, not tuple
 curry' :: ((a, b) -> c) -> (a -> b -> c)
@@ -100,3 +101,6 @@ altMap' f g (x : xs) = f x : altMap' g f xs
 
 luhnUsingAltMap' :: Int -> Bool
 luhnUsingAltMap' numbers = sum (altMap' C4.luhnDouble id (int2dec' numbers)) `mod` 10 == 0
+
+findBankCards' :: [Int] -> [Int]
+findBankCards' list = [card | card <- list, luhnUsingAltMap' card]
