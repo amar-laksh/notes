@@ -1,8 +1,8 @@
 module Chapter2
-  ( Chapter2.lastUsingNthElement,
-    Chapter2.lastUsingHeadReverse,
-    Chapter2.initUsingTake,
-    Chapter2.initUsingTailReverse,
+  ( lastUsingNthElement,
+    lastUsingHeadReverse,
+    initUsingTake,
+    initUsingTailReverse,
   )
 where
 

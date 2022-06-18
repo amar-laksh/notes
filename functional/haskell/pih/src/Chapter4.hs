@@ -1,21 +1,21 @@
 module Chapter4
-  ( Chapter4.halve,
-    Chapter4.thirdUsingHeadTail,
-    Chapter4.thirdUsingListIndexing,
-    Chapter4.thirdUsingPatterMatching,
-    Chapter4.safeTailUsingConditionalExpr,
-    Chapter4.safeTailUsingGuardedEquations,
-    Chapter4.safeTailUsingPatternMatching,
-    Chapter4.luhnDouble,
-    Chapter4.luhn,
+  ( halve',
+    thirdUsingHeadTail,
+    thirdUsingListIndexing,
+    thirdUsingPatterMatching,
+    safeTailUsingConditionalExpr,
+    safeTailUsingGuardedEquations,
+    safeTailUsingPatternMatching,
+    luhnDouble,
+    luhn,
   )
 where
 
-halve :: [el] -> ([el], [el])
-halve [] = ([], [])
-halve list
+halve' :: [el] -> ([el], [el])
+halve' [] = ([], [])
+halve' list
   | even (length list) = splitAt (length list `div` 2) list
-  | otherwise = error " halve doesn't take odd-sized list"
+  | otherwise = error " halve' doesn't take odd-sized list"
 
 thirdUsingHeadTail :: [el] -> el
 thirdUsingHeadTail list = head (tail (tail list))

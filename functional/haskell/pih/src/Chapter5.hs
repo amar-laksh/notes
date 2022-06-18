@@ -1,14 +1,14 @@
 module Chapter5
-  ( Chapter5.sumOfSquares,
-    Chapter5.grid,
-    Chapter5.square,
-    Chapter5.replicate,
-    Chapter5.pyths,
-    Chapter5.perfects,
-    Chapter5.find',
-    Chapter5.positions',
-    Chapter5.positionsUsingFind,
-    Chapter5.scalarProduct,
+  ( sumOfSquares,
+    grid,
+    square,
+    replicate',
+    pyths,
+    perfects,
+    find',
+    positions',
+    positionsUsingFind,
+    scalarProduct,
   )
 where
 
@@ -21,8 +21,8 @@ grid sizeX sizeY = [(x, y) | x <- [0 .. sizeX], y <- [0 .. sizeY]]
 square :: Int -> [(Int, Int)]
 square size = [(x, y) | (x, y) <- grid size size, x /= y]
 
-replicate :: Int -> el -> [el]
-replicate times el = [el | _ <- [1 .. times]]
+replicate' :: Int -> el -> [el]
+replicate' times el = [el | _ <- [1 .. times]]
 
 pyths :: Int -> Int -> [(Int, Int, Int)]
 pyths limit power =

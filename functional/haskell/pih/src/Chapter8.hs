@@ -5,6 +5,10 @@ module Chapter8
     nat2int',
     int2nat',
     buildSearchTree',
+    buildBinaryTree',
+    flattenSearchTree',
+    flattenBinaryTree',
+    binaryTreeLeaves',
     occurs',
   )
 where
@@ -33,16 +37,22 @@ occurs' node (SearchNode left root right) = case compare node root of
   GT -> occurs' node right
   EQ -> True
 
-buildSearchTree' :: [a] -> SearchTree a
+buildSearchTree' :: [t] -> SearchTree t
 buildSearchTree' (l : r : rs) = SearchNode (SearchLeaf l) r (buildSearchTree' rs)
 
-flattenSearchTree' :: SearchTree a -> [a]
-flattenSearchTree' (SearchLeaf a) = [a]
-flattenSearchTree' (SearchNode left root right) = flattenSearchTree' left ++ [root] ++ flattenSearchTree' right
+flattenSearchTree' :: SearchTree t -> [t]
+flattenSearchTree' (SearchLeaf leaf) = [leaf]
+flattenSearchTree' (SearchNode left root right) = flattenSearchTree' left ++ flattenSearchTree' right
 
-leavesCount' :: BinaryTree a -> Int
-leavesCount' (BinaryLeaf a) = 1
-leavesCount' (BinaryNode left right) = leavesCount' left + leavesCount' right
+buildBinaryTree' :: [t] -> BinaryTree t
+buildBinaryTree' (l : rs) = BinaryNode (BinaryLeaf l) (buildBinaryTree' rs)
+
+flattenBinaryTree' :: BinaryTree t -> [t]
+flattenBinaryTree' (BinaryLeaf leaf) = [leaf]
+flattenBinaryTree' (BinaryNode left right) = flattenBinaryTree' left ++ flattenBinaryTree' right
+
+binaryTreeLeaves' :: BinaryTree t -> [t]
+binaryTreeLeaves' = flattenBinaryTree'
 
 -- balanced' :: BinaryTree a -> Bool
 -- balanced' (BinaryLeaf a) = True

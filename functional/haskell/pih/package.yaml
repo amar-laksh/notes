@@ -56,3 +56,6 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - pih
+    - tasty
+    - tasty-hunit
+    - tasty-smallcheck

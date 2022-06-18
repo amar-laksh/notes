@@ -11,20 +11,20 @@ import qualified Chapter8 as C8
 main :: IO ()
 main = do
   let lst = [5, 1, 6, 4, 3, 2]
-  let sorted = C1.qsort lst
+  let sorted = C1.qsort' lst
   let revSorted = C1.qsortRev sorted
 
   print lst
   print sorted
   print revSorted
-  print (C1.product lst)
+  print (C1.product' lst)
 
   print (C2.lastUsingNthElement revSorted)
   print (C2.lastUsingHeadReverse revSorted)
   print (C2.initUsingTake revSorted)
   print (C2.initUsingTailReverse revSorted)
 
-  print (C4.halve lst)
+  print (C4.halve' lst)
   print (C4.thirdUsingHeadTail lst)
   print (C4.thirdUsingListIndexing lst)
   print (C4.thirdUsingPatterMatching lst)
@@ -40,7 +40,7 @@ main = do
   print (C5.sumOfSquares 100)
   print (C5.grid 1 2)
   print (C5.square 2)
-  print (C5.replicate 3 True)
+  print (C5.replicate' 3 True)
   print (C5.pyths 10 2)
   print (C5.perfects 500)
   print (C5.find' "blue" [("green", 1), ("blue", 2), ("blue", 3)])
@@ -77,3 +77,5 @@ main = do
 
   print (C8.nat2int' (C8.mult' (C8.int2nat' 2) (C8.int2nat' 3)))
   print (C8.occurs' 3 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]))
+  print (C8.flattenSearchTree' (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]))
+  print (C8.flattenBinaryTree' (C8.buildBinaryTree' [1, 3, 4, 5, 6, 7, 9]))

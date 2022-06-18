@@ -1,16 +1,16 @@
 module Chapter6
-  ( Chapter6.sumdown,
-    Chapter6.euclid,
-    Chapter6.and',
-    Chapter6.concat',
-    Chapter6.replicate',
+  ( sumdown,
+    euclid,
+    and',
+    concat',
+    replicate',
     (Chapter6.!!),
-    Chapter6.elem',
-    Chapter6.merge',
-    Chapter6.halve',
-    Chapter6.msort',
-    Chapter6.take',
-    Chapter6.zip',
+    elem',
+    merge',
+    halve',
+    msort',
+    take',
+    zip',
   )
 where
 
