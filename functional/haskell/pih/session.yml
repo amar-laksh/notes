@@ -4,3 +4,4 @@ windows:
     panes:
       - vim app/Main.hs
       - watch "stack build && stack exec pih-exe | tail -10"
+# stack bench --ba '+RTS -T'

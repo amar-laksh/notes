@@ -69,8 +69,8 @@ int2dec' n
   | n < 0 = error "Negative number handling not implemented"
   | otherwise =
     let nextpower = 10 ^ (numLength' n - 1)
-        (q, rem) = n `quotRem` nextpower
-     in if numLength' n - numLength' rem > 1
+        (q, remainder) = n `quotRem` nextpower
+     in if numLength' n - numLength' remainder > 1
           then q : 0 : int2dec' (n `mod` nextpower)
           else q : int2dec' (n `mod` nextpower)
 
@@ -96,7 +96,7 @@ transmit' :: String -> String
 transmit' = BT.decode' . BT.channel' . BT.encode'
 
 altMap' :: (a -> b) -> (a -> b) -> [a] -> [b]
-altMap' f g [] = []
+altMap' _ _ [] = []
 altMap' f g (x : xs) = f x : altMap' g f xs
 
 luhnUsingAltMap' :: Int -> Bool

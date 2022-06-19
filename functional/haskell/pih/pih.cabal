@@ -69,3 +69,18 @@ test-suite pih-test
     , tasty-hunit
     , tasty-smallcheck
   default-language: Haskell2010
+
+benchmark pih-bench
+  type: exitcode-stdio-1.0
+  main-is: Bench.hs
+  other-modules:
+      Paths_pih
+  hs-source-dirs:
+      bench
+  ghc-options: -threaded -rtsopts -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror -Wno-type-defaults
+  build-depends:
+      base >=4.7 && <5
+    , pih
+    , tasty-bench
+    , tasty-smallcheck
+  default-language: Haskell2010

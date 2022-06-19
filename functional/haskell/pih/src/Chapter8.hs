@@ -42,7 +42,7 @@ buildSearchTree' (l : r : rs) = SearchNode (SearchLeaf l) r (buildSearchTree' rs
 
 flattenSearchTree' :: SearchTree t -> [t]
 flattenSearchTree' (SearchLeaf leaf) = [leaf]
-flattenSearchTree' (SearchNode left root right) = flattenSearchTree' left ++ flattenSearchTree' right
+flattenSearchTree' (SearchNode left _ right) = flattenSearchTree' left ++ flattenSearchTree' right
 
 buildBinaryTree' :: [t] -> BinaryTree t
 buildBinaryTree' (l : rs) = BinaryNode (BinaryLeaf l) (buildBinaryTree' rs)

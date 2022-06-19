@@ -59,3 +59,27 @@ tests:
     - tasty
     - tasty-hunit
     - tasty-smallcheck
+
+benchmarks:
+  pih-bench:
+    main: Bench.hs
+    source-dirs: bench
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -Wall
+    - -Wcompat
+    - -Widentities
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wpartial-fields
+    - -Wredundant-constraints
+    - -Werror
+    - -Wno-type-defaults
+
+    dependencies:
+    - pih
+    - tasty-bench
+    - tasty-smallcheck
+
+

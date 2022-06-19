@@ -39,9 +39,6 @@ bin2int' = foldr (\x y -> x + 2 * y) 0
 make8' :: [Bit] -> [Bit]
 make8' bits = take 8 (bits ++ repeat 0)
 
-chop8' :: [Bit] -> [[Bit]]
-chop8' = unfold' (== []) (take 8) (drop 8)
-
 encode' :: String -> [Bit]
 encode' = concatMap (addParity' . make8' . int2bin' . ord)
 
