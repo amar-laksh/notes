@@ -13,6 +13,7 @@ module Chapter8
     listHalves',
     tree',
     balanced',
+    balance',
   )
 where
 
@@ -66,8 +67,14 @@ flattenBinaryTree' :: BinaryTree t -> [t]
 flattenBinaryTree' (BinaryLeaf leaf) = [leaf]
 flattenBinaryTree' (BinaryNode left right) = flattenBinaryTree' left ++ flattenBinaryTree' right
 
-binaryTreeLeaves' :: BinaryTree t -> [t]
-binaryTreeLeaves' = flattenBinaryTree'
+binaryTreeLeaves' :: BinaryTree t -> Int
+binaryTreeLeaves' (BinaryLeaf _) = 1
+binaryTreeLeaves' (BinaryNode left right) = binaryTreeLeaves' left + binaryTreeLeaves' right
 
 balanced' :: BinaryTree a -> Bool
 balanced' (BinaryLeaf a) = True
+balanced' (BinaryNode left right)
+  | abs (binaryTreeLeaves' left - binaryTreeLeaves' right) <= 1 = True
+  | otherwise = False
+
+balance' = buildBinaryTree'

@@ -78,7 +78,7 @@ main = do
   print (C8.listHalves' t)
   print (C8.flattenSearchTree' (C8.buildSearchTree' t))
   print (C8.flattenBinaryTree' (C8.buildBinaryTree' [1, 2, 3, 4]))
-  print (C8.balanced' (C8.buildBinaryTree' [1, 2, 3, 4, 5, 6]))
-
--- print (C8.occurs' 3 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]))
-{- print (C8.flattenSearchTree' (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9])) -}
+  print (C8.binaryTreeLeaves' (C8.buildBinaryTree' [1, 2, 3, 4, 5, 6]))
+  print (C8.occurs' 10 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]))
+  print (C8.balanced' (C8.buildBinaryTree' [1 .. 11]))
+  print (C8.flattenBinaryTree' (C8.balance' [1, 2, 3, 4]))
