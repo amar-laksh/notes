@@ -72,10 +72,13 @@ main = do
   print (C7.luhnUsingAltMap' 1020)
   print (C7.int2dec' 102030)
   print (C7.luhnUsingAltMap' 199)
-  -- No good, very very bad function
-  -- print ((C7.findBankCards' [4600 .. 4700]))
-
   print (C8.nat2int' (C8.mult' (C8.int2nat' 2) (C8.int2nat' 3)))
-  print (C8.occurs' 3 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]))
-  print (C8.flattenSearchTree' (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]))
-  print (C8.flattenBinaryTree' (C8.buildBinaryTree' [1, 3, 4, 5, 6, 7, 9]))
+  let t = [1, 3, 4, 5, 6, 7, 9] :: [Int]
+  print (C8.flattenBinaryTree' C8.tree')
+  print (C8.listHalves' t)
+  print (C8.flattenSearchTree' (C8.buildSearchTree' t))
+  print (C8.flattenBinaryTree' (C8.buildBinaryTree' [1, 2, 3, 4]))
+  print (C8.balanced' (C8.buildBinaryTree' [1, 2, 3, 4, 5, 6]))
+
+-- print (C8.occurs' 3 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]))
+{- print (C8.flattenSearchTree' (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9])) -}

@@ -10,8 +10,13 @@ module Chapter8
     flattenBinaryTree',
     binaryTreeLeaves',
     occurs',
+    listHalves',
+    tree',
+    balanced',
   )
 where
+
+import qualified Chapter6 as C6
 
 data Nat = Zero | Succ Nat
 
@@ -37,15 +42,25 @@ occurs' node (SearchNode left root right) = case compare node root of
   GT -> occurs' node right
   EQ -> True
 
-buildSearchTree' :: [t] -> SearchTree t
-buildSearchTree' (l : r : rs) = SearchNode (SearchLeaf l) r (buildSearchTree' rs)
+listHalves' :: [t] -> ([t], [t])
+listHalves' list = do
+  let listLengthHalf = length list `div` 2
+  (take listLengthHalf list, reverse (take listLengthHalf (reverse list)))
+
+buildSearchTree' :: [el] -> SearchTree el
+buildSearchTree' [el] = SearchLeaf el
+buildSearchTree' list = SearchNode (buildSearchTree' (fst (listHalves' list))) (list !! (length list `div` 2)) (buildSearchTree' (snd (listHalves' list)))
 
 flattenSearchTree' :: SearchTree t -> [t]
 flattenSearchTree' (SearchLeaf leaf) = [leaf]
-flattenSearchTree' (SearchNode left _ right) = flattenSearchTree' left ++ flattenSearchTree' right
+flattenSearchTree' (SearchNode left r right) = flattenSearchTree' left ++ [r] ++ flattenSearchTree' right
 
 buildBinaryTree' :: [t] -> BinaryTree t
-buildBinaryTree' (l : rs) = BinaryNode (BinaryLeaf l) (buildBinaryTree' rs)
+buildBinaryTree' [el] = BinaryLeaf el
+buildBinaryTree' list = BinaryNode (buildBinaryTree' (fst (listHalves' list))) (buildBinaryTree' (snd (listHalves' list)))
+
+tree' :: BinaryTree Int
+tree' = BinaryNode (BinaryLeaf 1) (BinaryLeaf 2)
 
 flattenBinaryTree' :: BinaryTree t -> [t]
 flattenBinaryTree' (BinaryLeaf leaf) = [leaf]
@@ -54,6 +69,5 @@ flattenBinaryTree' (BinaryNode left right) = flattenBinaryTree' left ++ flattenB
 binaryTreeLeaves' :: BinaryTree t -> [t]
 binaryTreeLeaves' = flattenBinaryTree'
 
--- balanced' :: BinaryTree a -> Bool
--- balanced' (BinaryLeaf a) = True
-{- balanced' (BInaryNode left root right) =  -}
+balanced' :: BinaryTree a -> Bool
+balanced' (BinaryLeaf a) = True
