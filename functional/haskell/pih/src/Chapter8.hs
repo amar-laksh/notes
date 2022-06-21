@@ -11,9 +11,10 @@ module Chapter8
     binaryTreeLeaves',
     occurs',
     listHalves',
-    tree',
     balanced',
     balance',
+    folde',
+    expr',
   )
 where
 
@@ -78,3 +79,11 @@ balanced' (BinaryNode left right)
   | otherwise = False
 
 balance' = buildBinaryTree'
+
+data Expr' = Val' Int | Add' Expr' Expr'
+
+expr' :: Expr'
+expr' = Val' 2
+
+folde' :: (Int -> a) -> (a -> a -> a) -> Expr' -> a
+folde' f _ (Val' x) = f x

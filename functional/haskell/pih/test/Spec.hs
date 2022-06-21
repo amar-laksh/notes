@@ -41,8 +41,7 @@ chapter2Tests =
     ]
 
 {- chapter4Tests :: TestTree -}
--- chapter4Tests =
--- testGroup
+-- chapter4Tests = testGroup
 -- "Chapter 4"
 -- [ SC.testProperty "C4.halve' == halve" $
 -- \list -> C4.halve' (list :: [Int]) == C7.halve' list
