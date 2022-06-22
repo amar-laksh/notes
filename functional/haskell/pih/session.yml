@@ -3,5 +3,5 @@ windows:
     layout: e307,174x45,0,0{97x45,0,0,4,76x45,98,0,5}
     panes:
       - vim app/Main.hs
-      - watch "stack build && stack exec pih-exe | tail -10"
+      - watch -n 1 "stack build --fast && $(stack exec which pih-exe) | tail -10"
 # stack bench --ba '+RTS -T'
