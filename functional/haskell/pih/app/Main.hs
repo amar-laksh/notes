@@ -7,6 +7,7 @@ import qualified Chapter5 as C5
 import qualified Chapter6 as C6
 import qualified Chapter7 as C7
 import qualified Chapter8 as C8
+import qualified TautologyChecker as TC
 
 main :: IO ()
 main = do
@@ -82,6 +83,8 @@ main = do
   print (C8.occurs' 10 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]))
   print (C8.balanced' (C8.buildBinaryTree' [1 .. 11]))
   print (C8.flattenBinaryTree' (C8.balance' [1, 2, 3, 4]))
-  print (C8.folde' (+ 2) (*) C8.expr')
-  print (C8.eval' C8.expr')
-  print (C8.size' C8.expr')
+  let expr = (C8.Add' (C8.Add' (C8.Val' 2) (C8.Val' 4)) (C8.Val' 5))
+  print (C8.folde' (+ 2) (*) expr)
+  print (C8.eval' expr)
+  let props = TC.And (TC.Var 'A') (TC.Not (TC.Var 'A'))
+  print (props)

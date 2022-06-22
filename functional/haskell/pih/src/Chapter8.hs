@@ -12,9 +12,9 @@ module Chapter8
     balanced',
     balance',
     folde',
-    expr',
     eval',
     size',
+    Expr' (..),
   )
 where
 
@@ -61,9 +61,6 @@ buildBinaryTree' :: [t] -> BinaryTree t
 buildBinaryTree' [el] = BinaryLeaf el
 buildBinaryTree' list = BinaryNode (buildBinaryTree' (fst (listHalves' list))) (buildBinaryTree' (snd (listHalves' list)))
 
-tree' :: BinaryTree Int
-tree' = BinaryNode (BinaryLeaf 1) (BinaryLeaf 2)
-
 flattenBinaryTree' :: BinaryTree t -> [t]
 flattenBinaryTree' (BinaryLeaf leaf) = [leaf]
 flattenBinaryTree' (BinaryNode left right) = flattenBinaryTree' left ++ flattenBinaryTree' right
@@ -80,10 +77,7 @@ balanced' (BinaryNode left right)
 
 balance' = buildBinaryTree'
 
-data Expr' = Val' Int | Add' Expr' Expr'
-
-expr' :: Expr'
-expr' = Add' (Add' (Val' 2) (Val' 4)) (Val' 5)
+data Expr' = Val' Int | Add' Expr' Expr' deriving (Show)
 
 folde' :: (Int -> a) -> (a -> a -> a) -> Expr' -> a
 folde' f _ (Val' x) = f x
