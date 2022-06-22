@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
-
 module Chapter8
   ( mult',
     nat2int',
@@ -15,6 +13,8 @@ module Chapter8
     balance',
     folde',
     expr',
+    eval',
+    size',
   )
 where
 
@@ -83,7 +83,30 @@ balance' = buildBinaryTree'
 data Expr' = Val' Int | Add' Expr' Expr'
 
 expr' :: Expr'
-expr' = Val' 2
+expr' = Add' (Add' (Val' 2) (Val' 4)) (Val' 5)
 
 folde' :: (Int -> a) -> (a -> a -> a) -> Expr' -> a
 folde' f _ (Val' x) = f x
+folde' f g (Add' exp1 exp2) = g (folde' f g exp1) (folde' f g exp2)
+
+eval' :: Expr' -> Int
+eval' = folde' id (+)
+
+size' :: Expr' -> Int
+size' = folde' (const 1) (+)
+
+data Maybe' a = Just' a | Nothing'
+
+instance Eq a => Eq (Maybe' a) where
+  Just' x == Just' y = x == y
+  Nothing' == Nothing' = True
+  _ == _ = False
+
+newtype List' el = List' [el]
+
+instance Eq a => Eq (List' a) where
+  List' [] == List' [] = True
+  List' [_] == List' [] = False
+  List' [] == List' (x : xs) = False
+  List' (x : y : ys) == List' [] = False
+  List' (x : xs) == List' (y : ys) = x == y && xs == ys

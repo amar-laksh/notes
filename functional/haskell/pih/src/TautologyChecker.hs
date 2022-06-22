@@ -1,0 +1,4 @@
+module TautologyChecker
+  (
+  )
+where

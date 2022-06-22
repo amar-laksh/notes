@@ -34,6 +34,7 @@ library
       Chapter7
       Chapter8
       Lib
+      TautologyChecker
   other-modules:
       Paths_pih
   hs-source-dirs:
