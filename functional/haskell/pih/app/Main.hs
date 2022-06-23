@@ -1,5 +1,6 @@
 module Main where
 
+import qualified AbstractMachine as AM
 import qualified Chapter1 as C1
 import qualified Chapter2 as C2
 import qualified Chapter4 as C4
@@ -89,3 +90,5 @@ main = do
   let prop = TC.And (TC.Var 'A') (TC.Not (TC.Var 'A'))
   print (TC.isTaut' prop)
   print (TC.isTaut' (TC.Imply (TC.And (TC.Var 'A') (TC.Var 'B')) (TC.Var 'A')))
+  let expr' = AM.Add (AM.Mult (AM.Val 2) (AM.Val 4)) (AM.Val 5)
+  print (AM.value' expr')
