@@ -34,6 +34,7 @@ library
       Chapter6
       Chapter7
       Chapter8
+      CountdownSolver
       Lib
       TautologyChecker
   other-modules:

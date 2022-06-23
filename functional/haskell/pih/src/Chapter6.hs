@@ -56,9 +56,12 @@ merge' (a : as) (b : bs)
 
 halve' :: [el] -> ([el], [el])
 halve' [] = ([], [])
-halve' list
-  | even (length list) = (take (length list `div` 2) list, fst (halve' (reverse list)))
-  | otherwise = (head list : fst (halve' (tail list)), snd (halve' (tail list)))
+halve' list = do
+  let lengthOfList = length list
+  let tillMiddleOf = lengthOfList `div` 2
+  if even lengthOfList
+    then (take tillMiddleOf list, fst (halve' (reverse list)))
+    else (head list : fst (halve' (tail list)), snd (halve' (tail list)))
 
 msort' :: Ord el => [el] -> [el]
 msort' [] = []
