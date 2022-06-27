@@ -93,5 +93,4 @@ main = do
   print (TC.isTaut' (TC.Imply (TC.And (TC.Var 'A') (TC.Var 'B')) (TC.Var 'A')))
   let expr' = AM.Add (AM.Mult (AM.Val 2) (AM.Val 4)) (AM.Val 5)
   print (AM.value' expr')
-  print (CS.countdown' [1, 3, 7, 10, 25, 50] 765)
-  print (CS.choices' [1, 2, 3])
+  print (CS.solutions' [1, 3, 7, 10, 25, 50] 765)

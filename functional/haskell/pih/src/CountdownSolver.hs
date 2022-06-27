@@ -1,8 +1,7 @@
 module CountdownSolver
-  ( countdown',
+  ( solutions',
     perms',
     interleave',
-    choices',
   )
 where
 
@@ -27,11 +26,11 @@ instance Show Expr where
       bracket expr = "(" ++ show expr ++ ")"
 
 valid :: Op -> Int -> Int -> Bool
-valid Add _ _ = True
-valid Mul _ _ = True
+valid Add x y = x <= y
 valid Sub x y = x > y
-valid Div x y = x `mod` y == 0
-valid Exp _ y = y > 0
+valid Mul x y = x <= y
+valid Div x y = y /= 0 && x `mod` y == 0
+valid Exp x y = x >= 0 && y >= 0
 
 apply' :: Op -> Int -> Int -> Int
 apply' Add x y = x + y
@@ -39,6 +38,10 @@ apply' Mul x y = x * y
 apply' Sub x y = x - y
 apply' Div x y = x `div` y
 apply' Exp x y = x ^ y
+
+values' :: Expr -> [Int]
+values' (Val n) = [n]
+values' (App _ left right) = values' left ++ values' right
 
 eval' :: Expr -> [Int]
 eval' (Val v) = [v | v > 0]
@@ -55,11 +58,30 @@ interleave' n [] = [[n]]
 interleave' n (x : xs) = (n : x : xs) : map (x :) (interleave' n xs)
 
 perms' :: [a] -> [[a]]
-perms' [] = [[]]
-perms' (x : xs) = concatMap (interleave' x) (perms' xs)
+perms' = foldr (concatMap . interleave') [[]]
 
 choices' :: [a] -> [[a]]
 choices' = concatMap perms' . subs'
 
-countdown' :: [Int] -> Int -> Expr
-countdown' seq target = Val target
+solution' :: Expr -> [Int] -> Int -> Bool
+solution' exp ns target = elem (values' exp) (choices' ns) && eval' exp == [target]
+
+split' :: [a] -> [([a], [a])]
+split' [] = []
+split' [_] = []
+split' (x : xs) = ([x], xs) : [(x : ls, rs) | (ls, rs) <- split' xs]
+
+ops :: [Op]
+ops = [Add, Sub, Mul, Div, Exp]
+
+combine' :: Expr -> Expr -> [Expr]
+combine' l r = [App op l r | op <- ops]
+
+exprs' :: [Int] -> [Expr]
+exprs' [] = []
+exprs' [n] = [Val n]
+exprs' ns = [e | (ls, rs) <- split' ns, l <- exprs' ls, r <- exprs' rs, e <- combine' l r]
+
+solutions' :: [Int] -> Int -> [Expr]
+solutions' ns target =
+  [exp | ns' <- choices' ns, exp <- exprs' ns', eval' exp == [target]]
