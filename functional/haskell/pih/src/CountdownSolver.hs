@@ -1,7 +1,8 @@
 module CountdownSolver
-  ( solutions',
-    perms',
+  ( perms',
     interleave',
+    evalPercent',
+    solutions',
   )
 where
 
@@ -12,7 +13,7 @@ instance Show Op where
   show Sub = "-"
   show Mul = "*"
   show Div = "/"
-  show Exp = "^"
+  show Exp = "**"
 
 data Expr
   = Val Int
@@ -26,11 +27,11 @@ instance Show Expr where
       bracket expr = "(" ++ show expr ++ ")"
 
 valid :: Op -> Int -> Int -> Bool
-valid Add x y = x <= y
+valid Add x y = x < y
 valid Sub x y = x > y
-valid Mul x y = x <= y
-valid Div x y = y /= 0 && x `mod` y == 0
-valid Exp x y = x >= 0 && y >= 0
+valid Mul x y = x /= 1 && y /= 1 && x <= y
+valid Div x y = y > 1 && x `mod` y == 0
+valid Exp x y = x > 1 && y > 1
 
 apply' :: Op -> Int -> Int -> Int
 apply' Add x y = x + y
@@ -85,3 +86,9 @@ exprs' ns = [e | (ls, rs) <- split' ns, l <- exprs' ls, r <- exprs' rs, e <- com
 solutions' :: [Int] -> Int -> [Expr]
 solutions' ns target =
   [exp | ns' <- choices' ns, exp <- exprs' ns', eval' exp == [target]]
+
+evalPercent' :: [Int] -> Int -> (Float, Int, Int)
+evalPercent' ns target = (fromIntegral validExprs / fromIntegral possibleExprs * 100, validExprs, possibleExprs)
+  where
+    validExprs = length [e | ns' <- choices' ns, exp <- exprs' ns', e <- eval' exp]
+    possibleExprs = length [exp | ns' <- choices' ns, exp <- exprs' ns']
