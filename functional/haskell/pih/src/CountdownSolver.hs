@@ -61,8 +61,15 @@ interleave' n (x : xs) = (n : x : xs) : map (x :) (interleave' n xs)
 perms' :: [a] -> [[a]]
 perms' = foldr (concatMap . interleave') [[]]
 
+concat' :: [[a]] -> [a]
+concat' [] = []
+concat' [[]] = []
+concat' [[el]] = [el]
+concat' [x : xs] = x : concat' [xs]
+
 choices' :: [a] -> [[a]]
-choices' = concatMap perms' . subs'
+-- choices' = concatMap perms' . subs'
+choices' list = concat' [perms' els | els <- subs' list]
 
 solution' :: Expr -> [Int] -> Int -> Bool
 solution' exp ns target = elem (values' exp) (choices' ns) && eval' exp == [target]
