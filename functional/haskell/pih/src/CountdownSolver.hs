@@ -3,21 +3,29 @@ module CountdownSolver
     interleave',
     evalPercent',
     solutions',
+    nearestSolutions',
+    approxSolutions',
+    Expr (..),
+    isChoice',
+    removeFirstOccurence',
+    eval',
+    values',
   )
 where
 
-data Op = Add | Sub | Mul | Div | Exp
+data Op = Add | Sub | Mul | Div | Exp deriving (Eq, Ord)
 
 instance Show Op where
   show Add = "+"
   show Sub = "-"
   show Mul = "*"
   show Div = "/"
-  show Exp = "**"
+  show Exp = "^"
 
 data Expr
   = Val Int
   | App Op Expr Expr
+  deriving (Eq, Ord)
 
 instance Show Expr where
   show (Val n) = show n
@@ -61,15 +69,9 @@ interleave' n (x : xs) = (n : x : xs) : map (x :) (interleave' n xs)
 perms' :: [a] -> [[a]]
 perms' = foldr (concatMap . interleave') [[]]
 
-concat' :: [[a]] -> [a]
-concat' [] = []
-concat' [[]] = []
-concat' [[el]] = [el]
-concat' [x : xs] = x : concat' [xs]
-
 choices' :: [a] -> [[a]]
 -- choices' = concatMap perms' . subs'
-choices' list = concat' [perms' els | els <- subs' list]
+choices' list = [v | xs <- subs' list, v <- perms' xs]
 
 solution' :: Expr -> [Int] -> Int -> Bool
 solution' exp ns target = elem (values' exp) (choices' ns) && eval' exp == [target]
@@ -94,8 +96,36 @@ solutions' :: [Int] -> Int -> [Expr]
 solutions' ns target =
   [exp | ns' <- choices' ns, exp <- exprs' ns', eval' exp == [target]]
 
+smallerSolutions' :: [Int] -> Int -> [Expr]
+smallerSolutions' ns target =
+  [exp | ns' <- choices' ns, exp <- exprs' ns', eval' exp < [target]]
+
+maximum' :: Ord a => [a] -> a
+maximum' = foldr1 (\x y -> if x >= y then x else y)
+
+nearestSolutions' :: [Int] -> Int -> [Expr]
+nearestSolutions' ns target =
+  solutions' ns (maximum' [v | exp <- smallerSolutions' ns target, v <- eval' exp])
+
+approxSolutions' :: [Int] -> Int -> [Expr]
+approxSolutions' ns target
+  | null sols = nearestSolutions' ns target
+  | otherwise = sols
+  where
+    sols = solutions' ns target
+
 evalPercent' :: [Int] -> Int -> (Float, Int, Int)
 evalPercent' ns target = (fromIntegral validExprs / fromIntegral possibleExprs * 100, validExprs, possibleExprs)
   where
     validExprs = length [e | ns' <- choices' ns, exp <- exprs' ns', e <- eval' exp]
     possibleExprs = length [exp | ns' <- choices' ns, exp <- exprs' ns']
+
+removeFirstOccurence' :: Eq a => a -> [a] -> [a]
+removeFirstOccurence' _ [] = []
+removeFirstOccurence' val (x : xs)
+  | val == x = xs
+  | otherwise = x : removeFirstOccurence' val xs
+
+isChoice' :: (Eq a, Num a, Enum a) => [a] -> [a] -> Bool
+isChoice' [] _ = True
+isChoice' (x : xs) listHaystack = x `elem` listHaystack && isChoice' xs (removeFirstOccurence' x listHaystack)

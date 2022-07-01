@@ -8,7 +8,7 @@ import qualified Chapter5 as C5
 import qualified Chapter6 as C6
 import qualified Chapter7 as C7
 import qualified Chapter8 as C8
-import qualified CountdownSolver as CS
+import qualified Chapter9 as C9
 import qualified TautologyChecker as TC
 
 main :: IO ()
@@ -93,4 +93,6 @@ main = do
   print (TC.isTaut' (TC.Imply (TC.And (TC.Var 'A') (TC.Var 'B')) (TC.Var 'A')))
   let expr' = AM.Add (AM.Mult (AM.Val 2) (AM.Val 4)) (AM.Val 5)
   print (AM.value' expr')
-  print (CS.solutions' [1, 3, 7, 10, 25, 50] 765)
+  print (C9.countdowndownApproxSortedSolutions' [2, 3, 4, 5] 100)
+
+-- print (C9.countdownApproxSolutions' [1, 3, 7, 10, 25, 50] 765)
