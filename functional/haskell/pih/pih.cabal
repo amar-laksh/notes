@@ -28,6 +28,7 @@ library
       AbstractMachine
       BinaryStringTransmitter
       Chapter1
+      Chapter10
       Chapter2
       Chapter4
       Chapter5
@@ -37,6 +38,7 @@ library
       Chapter9
       CountdownSolver
       Lib
+      Nim
       TautologyChecker
   other-modules:
       Paths_pih
