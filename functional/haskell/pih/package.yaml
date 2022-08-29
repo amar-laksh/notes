@@ -59,6 +59,7 @@ tests:
     - tasty
     - tasty-hunit
     - tasty-smallcheck
+    - smallcheck
 
 benchmarks:
   pih-bench:

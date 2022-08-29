@@ -1,5 +1,6 @@
 module Chapter4
   ( halve',
+    halveErrorMsg,
     thirdUsingHeadTail,
     thirdUsingListIndexing,
     thirdUsingPatterMatching,
@@ -11,11 +12,13 @@ module Chapter4
   )
 where
 
+halveErrorMsg = "halve' doesn't take odd-sized list"
+
 halve' :: [el] -> ([el], [el])
 halve' [] = ([], [])
 halve' list
   | even (length list) = splitAt (length list `div` 2) list
-  | otherwise = error " halve' doesn't take odd-sized list"
+  | otherwise = error halveErrorMsg
 
 thirdUsingHeadTail :: [el] -> el
 thirdUsingHeadTail list = head (tail (tail list))
