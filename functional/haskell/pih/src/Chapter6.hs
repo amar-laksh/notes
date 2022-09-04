@@ -60,7 +60,7 @@ halve' list = do
   let lengthOfList = length list
   let tillMiddleOf = lengthOfList `div` 2
   if even lengthOfList
-    then (take tillMiddleOf list, fst (halve' (reverse list)))
+    then (take tillMiddleOf list, reverse (fst (halve' (reverse list))))
     else (head list : fst (halve' (tail list)), snd (halve' (tail list)))
 
 msort' :: Ord el => [el] -> [el]

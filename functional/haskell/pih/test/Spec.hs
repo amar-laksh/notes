@@ -6,7 +6,7 @@ import qualified Chapter6 as C6
 import qualified Chapter7 as C7
 import qualified Chapter8 as C8
 import Control.Exception
-import Test.SmallCheck.Series (NonEmpty (NonEmpty), list)
+import Test.SmallCheck.Series (NonEmpty (NonEmpty), NonNegative (NonNegative), list)
 import Test.Tasty
 import Test.Tasty.HUnit
 import qualified Test.Tasty.SmallCheck as SC
@@ -15,12 +15,12 @@ main :: IO ()
 main = defaultMain tests
 
 tests :: TestTree
-tests = testGroup "Tests" [chapter1Tests, chapter2Tests, chapter4Tests]
+tests = testGroup "Tests" [chapter1Tests, chapter2Tests, chapter4Tests, chapter5Tests, chapter6Tests, chapter7Tests, chapter8Tests]
 
 chapter1Tests :: TestTree
 chapter1Tests =
   testGroup
-    "Chapter 1"
+    "*** Chapter 1 ***"
     [ SC.testProperty "C1.qsort' == C1.qsort'.reverse" $
         \list -> C1.qsort' (list :: [Int]) == C1.qsort' (reverse list),
       SC.testProperty "C1.qsortRev == reverse.C1.qsort'" $
@@ -41,37 +41,92 @@ checkErrorMsg errorMsg f = throws errorMsg f @? errorPrefix ++ errorMsg
 chapter2Tests :: TestTree
 chapter2Tests =
   testGroup
-    "Chapter 2"
+    "*** Chapter 2 ***"
     [ SC.testProperty "C2.lastUsingNthElement == last" $
         \(NonEmpty list) -> C2.lastUsingNthElement (list :: [Int]) == last list,
-      testCase "C2.lastUsingNthElement []== error message" $
+      testCase "C2.lastUsingNthElement [] == error message" $
         checkErrorMsg C2.errorMsg (C2.lastUsingNthElement []),
       SC.testProperty "C2.lastUsingHeadReverse == last" $
         \(NonEmpty list) -> C2.lastUsingHeadReverse (list :: [Int]) == last list,
-      testCase "C2.lastUsingHeadReverse []== error message" $
+      testCase "C2.lastUsingHeadReverse [] == error message" $
         checkErrorMsg C2.errorMsg (C2.lastUsingHeadReverse []),
       SC.testProperty "C2.initUsingTake == init" $
         \(NonEmpty list) -> C2.initUsingTake (list :: [Int]) == init list,
-      testCase "C2.initUsingTake []== error message" $
+      testCase "C2.initUsingTake [] == error message" $
         checkErrorMsg C2.errorMsg (C2.initUsingTake []),
       SC.testProperty "C2.initUsingTailReverse == init" $
         \(NonEmpty list) -> C2.initUsingTailReverse (list :: [Int]) == init list,
-      testCase "C2.initUsingTailReverse []== error message" $
+      testCase "C2.initUsingTailReverse [] == error message" $
         checkErrorMsg C2.errorMsg (C2.initUsingTailReverse [])
     ]
 
-onlyEven :: ([a] -> Bool) -> [a] -> Bool
-onlyEven _ [] = True
-onlyEven _ [x] = False
-onlyEven _ [x, y] = True
-onlyEven f (x : y : xs) = onlyEven f xs
+-- onlyEven :: ([a] -> Bool) -> [a] -> Bool
+-- onlyEven _ [] = True
+-- onlyEven _ [x] = False
+-- onlyEven f (x : y : xs) = onlyEven f xs
 
 chapter4Tests :: TestTree
 chapter4Tests =
   testGroup
-    "Chapter 4"
-    [ testCase "C4.halve' [1,2,3,4]== ([1,2], [3,4])" $
+    "*** Chapter 4 ***"
+    [ testCase "C4.halve' [1,2,3,4] == ([1,2], [3,4])" $
         C4.halve' [1, 2, 3, 4] `compare` ([1, 2], [3, 4]) @?= EQ,
       testCase "C4.halve' [1] == error message" $
-        checkErrorMsg C4.halveErrorMsg (C4.halve' [1])
+        checkErrorMsg C4.halveErrorMsg (C4.halve' [1]),
+      testCase "C4.luhn' 1 2 3 4 == False" $
+        assertBool "Expected this to return False." $ not (C4.luhn 1 2 3 4),
+      testCase "C4.luhn' 1 7 8 4 == True" $
+        assertBool "Expected this to return True." $ C4.luhn 1 7 8 4
+    ]
+
+chapter5Tests :: TestTree
+chapter5Tests =
+  testGroup
+    "*** Chapter 5 ***"
+    [ SC.testProperty "C5.scalarProduct is commutative i.e.  a.b = b.a" $
+        \list -> C5.scalarProduct list (take 5 list) == C5.scalarProduct (take 5 list) list,
+      SC.testProperty "C5.scalarProduct holds scalar multiplication i.e. (4*a).(2*b) = 8(a.b)" $
+        \list -> C5.scalarProduct (map (* 4) list) (map (* 2) (take 5 list)) == 8 * C5.scalarProduct list (take 5 list),
+      testCase "C5.scalarProduct [1,2,3] [4,5,6] == 32" $
+        C5.scalarProduct [1, 2, 3] [4, 5, 6] `compare` 32 @?= EQ
+    ]
+
+chapter6Tests :: TestTree
+chapter6Tests =
+  testGroup
+    "*** Chapter 6 ***"
+    [ SC.testProperty "tests C6.halve' by checking length of result lists" $
+        \(list :: [Int]) -> do
+          let lengthOfList = length list
+          let lengthOfHalfList = length (take (lengthOfList `div` 2) list)
+          let lengthOfFstHalve = length (fst (C6.halve' list))
+          let lengthOfSndHalve = length (snd (C6.halve' list))
+          lengthOfFstHalve - lengthOfHalfList <= 1 && lengthOfSndHalve - lengthOfHalfList <= 1,
+      testCase "C6.msort' [5, 4, 0, 3, 2, 1] == [0, 1, 2, 3, 4, 5]" $
+        C6.msort' [5, 4, 0, 3, 2, 1] `compare` [0, 1, 2, 3, 4, 5] @?= EQ
+    ]
+
+chapter7Tests :: TestTree
+chapter7Tests =
+  testGroup
+    "*** Chapter 7 ***"
+    [ SC.testProperty "C7.transmit msg == msg" $
+        \(msg :: [Char]) -> C7.transmit' msg == msg,
+      testCase "C7.luhnUsingAltMap'  1234 == False" $
+        assertBool "Expected this to return False." $ not (C7.luhnUsingAltMap' 1234),
+      testCase "C4.luhnUsingAltMap'   1784 == True" $
+        assertBool "Expected this to return True." $ C7.luhnUsingAltMap' 1784
+    ]
+
+chapter8Tests :: TestTree
+chapter8Tests =
+  testGroup
+    "*** Chapter 8 ***"
+    [ SC.testProperty "tests C8.listHalves' by checking length of result lists" $
+        \(list :: [Int]) -> do
+          let lengthOfList = length list
+          let lengthOfHalfList = length (take (lengthOfList `div` 2) list)
+          let lengthOfFstHalve = length (fst (C8.listHalves' list))
+          let lengthOfSndHalve = length (snd (C8.listHalves' list))
+          lengthOfFstHalve == lengthOfHalfList && lengthOfSndHalve == lengthOfHalfList
     ]
