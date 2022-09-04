@@ -118,6 +118,8 @@ chapter7Tests =
         assertBool "Expected this to return True." $ C7.luhnUsingAltMap' 1784
     ]
 
+expr value = C8.Add' (C8.Add' (C8.Val' value) (C8.Val' (value + 1))) (C8.Val' (value + 2))
+
 chapter8Tests :: TestTree
 chapter8Tests =
   testGroup
@@ -128,5 +130,11 @@ chapter8Tests =
           let lengthOfHalfList = length (take (lengthOfList `div` 2) list)
           let lengthOfFstHalve = length (fst (C8.listHalves' list))
           let lengthOfSndHalve = length (snd (C8.listHalves' list))
-          lengthOfFstHalve == lengthOfHalfList && lengthOfSndHalve == lengthOfHalfList
+          lengthOfFstHalve == lengthOfHalfList && lengthOfSndHalve == lengthOfHalfList,
+      SC.testProperty "tests C8.eval' with the expr : (value + (value + 1)) + value + 2" $
+        \(value :: Int) -> C8.eval' (expr value) == ((value + (value + 1)) + value + 2),
+      testCase "C8.occurs' 10 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]) == False" $
+        assertBool "Expected this to return False." $ not (C8.occurs' 10 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9])),
+      testCase "C8.occurs' 9 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]) == True" $
+        assertBool "Expected this to return True." $ C8.occurs' 9 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9])
     ]
