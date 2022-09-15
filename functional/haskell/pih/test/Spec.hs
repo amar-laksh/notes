@@ -5,7 +5,10 @@ import qualified Chapter5 as C5
 import qualified Chapter6 as C6
 import qualified Chapter7 as C7
 import qualified Chapter8 as C8
+import qualified Chapter9 as C9
 import Control.Exception
+import qualified CountdownSolver as CS
+import Data.Maybe
 import Test.SmallCheck.Series (NonEmpty (NonEmpty), NonNegative (NonNegative), list)
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -15,7 +18,7 @@ main :: IO ()
 main = defaultMain tests
 
 tests :: TestTree
-tests = testGroup "Tests" [chapter1Tests, chapter2Tests, chapter4Tests, chapter5Tests, chapter6Tests, chapter7Tests, chapter8Tests]
+tests = testGroup "Tests" [chapter1Tests, chapter2Tests, chapter4Tests, chapter5Tests, chapter6Tests, chapter7Tests, chapter8Tests, chapter9Tests]
 
 chapter1Tests :: TestTree
 chapter1Tests =
@@ -59,11 +62,6 @@ chapter2Tests =
       testCase "C2.initUsingTailReverse [] == error message" $
         checkErrorMsg C2.errorMsg (C2.initUsingTailReverse [])
     ]
-
--- onlyEven :: ([a] -> Bool) -> [a] -> Bool
--- onlyEven _ [] = True
--- onlyEven _ [x] = False
--- onlyEven f (x : y : xs) = onlyEven f xs
 
 chapter4Tests :: TestTree
 chapter4Tests =
@@ -136,5 +134,19 @@ chapter8Tests =
       testCase "C8.occurs' 10 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]) == False" $
         assertBool "Expected this to return False." $ not (C8.occurs' 10 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9])),
       testCase "C8.occurs' 9 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]) == True" $
-        assertBool "Expected this to return True." $ C8.occurs' 9 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9])
+        assertBool "Expected this to return True." $ C8.occurs' 9 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]),
+      testCase "C8.eval' C8.Add' (C8.Add' (C8.Val' 2) (C8.Val' 4)) (C8.Val' 5) == 11" $
+        assertBool "Expected this to return True." (C8.eval' (C8.Add' (C8.Add' (C8.Val' 2) (C8.Val' 4)) (C8.Val' 5)) == 11)
+    ]
+
+chapter9Tests :: TestTree
+chapter9Tests =
+  testGroup
+    "*** Chapter 9 ***"
+    [ SC.testProperty "C9.countdownSolutions should yield expressions that eval up to N or []" $
+        \(list :: [Int], n :: Int) -> do
+          ( case map CS.eval' (C9.countdownSolutions' list n) of
+              [] -> True
+              expr -> all (== [n]) expr
+            )
     ]

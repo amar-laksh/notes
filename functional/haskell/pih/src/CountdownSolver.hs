@@ -10,6 +10,7 @@ module CountdownSolver
     removeFirstOccurence',
     eval',
     values',
+    exprs',
   )
 where
 
