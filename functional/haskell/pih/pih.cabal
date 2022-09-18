@@ -37,7 +37,9 @@ library
       Chapter8
       Chapter9
       CountdownSolver
+      Hangman
       Lib
+      Life
       Nim
       TautologyChecker
   other-modules:

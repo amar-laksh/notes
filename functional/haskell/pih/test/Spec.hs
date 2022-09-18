@@ -143,7 +143,7 @@ chapter9Tests :: TestTree
 chapter9Tests =
   testGroup
     "*** Chapter 9 ***"
-    [ SC.testProperty "C9.countdownSolutions should yield expressions that eval up to N or []" $
+    [ SC.testProperty "C9.countdownSolutions should yield expressions that eval up to N OR []" $
         \(list :: [Int], n :: Int) -> do
           ( case map CS.eval' (C9.countdownSolutions' list n) of
               [] -> True
