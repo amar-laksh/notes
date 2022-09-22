@@ -1,4 +1,5 @@
 import qualified Chapter1 as C1
+import qualified Chapter10 as C10
 import qualified Chapter2 as C2
 import qualified Chapter4 as C4
 import qualified Chapter5 as C5
@@ -6,9 +7,13 @@ import qualified Chapter6 as C6
 import qualified Chapter7 as C7
 import qualified Chapter8 as C8
 import qualified Chapter9 as C9
+import Control.Concurrent
 import Control.Exception
+import Control.Monad (when)
 import qualified CountdownSolver as CS
+import Data.List
 import Data.Maybe
+import System.IO.Silently
 import Test.SmallCheck.Series (NonEmpty (NonEmpty), NonNegative (NonNegative), list)
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -18,7 +23,7 @@ main :: IO ()
 main = defaultMain tests
 
 tests :: TestTree
-tests = testGroup "Tests" [chapter1Tests, chapter2Tests, chapter4Tests, chapter5Tests, chapter6Tests, chapter7Tests, chapter8Tests, chapter9Tests]
+tests = testGroup "Tests" [chapter1Tests, chapter2Tests, chapter4Tests, chapter5Tests, chapter6Tests, chapter7Tests, chapter8Tests, chapter9Tests, chapter10Tests]
 
 chapter1Tests :: TestTree
 chapter1Tests =
@@ -72,9 +77,11 @@ chapter4Tests =
       testCase "C4.halve' [1] == error message" $
         checkErrorMsg C4.halveErrorMsg (C4.halve' [1]),
       testCase "C4.luhn' 1 2 3 4 == False" $
-        assertBool "Expected this to return False." $ not (C4.luhn 1 2 3 4),
+        assertBool "Expected this to return False." $
+          not (C4.luhn 1 2 3 4),
       testCase "C4.luhn' 1 7 8 4 == True" $
-        assertBool "Expected this to return True." $ C4.luhn 1 7 8 4
+        assertBool "Expected this to return True." $
+          C4.luhn 1 7 8 4
     ]
 
 chapter5Tests :: TestTree
@@ -111,9 +118,11 @@ chapter7Tests =
     [ SC.testProperty "C7.transmit msg == msg" $
         \(msg :: [Char]) -> C7.transmit' msg == msg,
       testCase "C7.luhnUsingAltMap'  1234 == False" $
-        assertBool "Expected this to return False." $ not (C7.luhnUsingAltMap' 1234),
+        assertBool "Expected this to return False." $
+          not (C7.luhnUsingAltMap' 1234),
       testCase "C4.luhnUsingAltMap'   1784 == True" $
-        assertBool "Expected this to return True." $ C7.luhnUsingAltMap' 1784
+        assertBool "Expected this to return True." $
+          C7.luhnUsingAltMap' 1784
     ]
 
 expr value = C8.Add' (C8.Add' (C8.Val' value) (C8.Val' (value + 1))) (C8.Val' (value + 2))
@@ -132,9 +141,11 @@ chapter8Tests =
       SC.testProperty "tests C8.eval' with the expr : (value + (value + 1)) + value + 2" $
         \(value :: Int) -> C8.eval' (expr value) == ((value + (value + 1)) + value + 2),
       testCase "C8.occurs' 10 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]) == False" $
-        assertBool "Expected this to return False." $ not (C8.occurs' 10 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9])),
+        assertBool "Expected this to return False." $
+          not (C8.occurs' 10 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9])),
       testCase "C8.occurs' 9 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]) == True" $
-        assertBool "Expected this to return True." $ C8.occurs' 9 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]),
+        assertBool "Expected this to return True." $
+          C8.occurs' 9 (C8.buildSearchTree' [1, 3, 4, 5, 6, 7, 9]),
       testCase "C8.eval' C8.Add' (C8.Add' (C8.Val' 2) (C8.Val' 4)) (C8.Val' 5) == 11" $
         assertBool "Expected this to return True." (C8.eval' (C8.Add' (C8.Add' (C8.Val' 2) (C8.Val' 4)) (C8.Val' 5)) == 11)
     ]
@@ -149,4 +160,17 @@ chapter9Tests =
               [] -> True
               expr -> all (== [n]) expr
             )
+    ]
+
+chapter10Tests :: TestTree
+chapter10Tests =
+  testGroup
+    "*** Chapter 9 ***"
+    [ SC.testProperty "C10.putStr' should work the same way as putStr" $
+        \(msg :: String) -> SC.monadic $ do
+          (systemPutStr, _) <- capture (putStr msg)
+          -- Adding a small thread delay to let capture work correctly
+          threadDelay 1000
+          (myPutStr, _) <- capture (C10.putStr' msg)
+          return $ systemPutStr == systemPutStr
     ]

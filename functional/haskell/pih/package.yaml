@@ -61,6 +61,7 @@ tests:
     - tasty
     - tasty-hunit
     - tasty-smallcheck
+    - silently
     - smallcheck
 
 benchmarks:

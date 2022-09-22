@@ -75,6 +75,7 @@ test-suite pih-test
   build-depends:
       base >=4.7 && <5
     , pih
+    , silently
     , smallcheck
     , tasty
     , tasty-hunit
