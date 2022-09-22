@@ -1,10 +1,14 @@
 module Chapter10
   ( putStr',
     adder',
+    adderSeq',
+    readLine',
   )
 where
 
+import Control.Monad (unless)
 import Data.Maybe
+import System.IO
 import Text.Read
 
 putStr' :: String -> IO ()
@@ -31,3 +35,38 @@ adder' = do
   xs <- readInts n
   putStr "The total is: "
   print (sum xs)
+
+adderSeq' :: IO ()
+adderSeq' = do
+  putStrLn "How many numbers? "
+  n <- getInt
+  xs <- sequence [getInt | x <- [1 .. n]]
+  putStr "The total is: "
+  print (sum xs)
+
+getChar' :: IO Char
+getChar' = do
+  hSetEcho stdin False
+  x <- getChar
+  hSetEcho stdin True
+  return x
+
+readLine' :: IO String
+readLine' = getLine' ""
+
+getLine' :: String -> IO String
+getLine' xs = do
+  x <- getChar'
+  case x of
+    '\n' -> do
+      putChar x
+      return xs
+    '\DEL' ->
+      if null xs
+        then getLine' ""
+        else do
+          putStr "\b \b"
+          getLine' (init xs)
+    _ -> do
+      putChar x
+      getLine' (xs ++ [x])
