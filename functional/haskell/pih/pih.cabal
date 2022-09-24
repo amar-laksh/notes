@@ -42,6 +42,7 @@ library
       Life
       Nim
       TautologyChecker
+      TicTacToe
   other-modules:
       Paths_pih
   hs-source-dirs:
