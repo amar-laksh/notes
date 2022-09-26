@@ -7,6 +7,7 @@ module Life
     playLife,
     convertToBoard,
     isPrime,
+    clearScn,
   )
 where
 

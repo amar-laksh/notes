@@ -3,6 +3,8 @@ module Chapter10
     adder',
     adderSeq',
     readLine',
+    getLine',
+    getChar',
   )
 where
 
