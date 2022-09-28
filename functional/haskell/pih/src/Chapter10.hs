@@ -54,7 +54,9 @@ getChar' = do
   return x
 
 readLine' :: IO String
-readLine' = getLine' ""
+readLine' = do
+  hSetBuffering stdin NoBuffering
+  getLine' ""
 
 getLine' :: String -> IO String
 getLine' xs = do

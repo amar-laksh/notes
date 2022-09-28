@@ -37,6 +37,7 @@ library
       Chapter8
       Chapter9
       CountdownSolver
+      Graphics
       Hangman
       Lib
       Life
@@ -49,6 +50,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , process
   default-language: Haskell2010
 
 executable pih-exe
@@ -61,6 +63,7 @@ executable pih-exe
   build-depends:
       base >=4.7 && <5
     , pih
+    , process
   default-language: Haskell2010
 
 test-suite pih-test
@@ -76,6 +79,7 @@ test-suite pih-test
   build-depends:
       base >=4.7 && <5
     , pih
+    , process
     , silently
     , smallcheck
     , tasty
@@ -94,6 +98,7 @@ benchmark pih-bench
   build-depends:
       base >=4.7 && <5
     , pih
+    , process
     , tasty-bench
     , tasty-smallcheck
   default-language: Haskell2010

@@ -10,8 +10,8 @@ module TicTacToe
   )
 where
 
-import Chapter10 (getChar')
-import Data.Char
+import Chapter10 (getChar', readLine')
+import Data.Char (digitToInt)
 import Data.List
 import Life (clearScn, goto')
 
@@ -118,10 +118,10 @@ prevTurn turn = turn - 15
 
 processInput :: Int -> IO (Int, (Int, Int))
 processInput turn = do
-  input <- getChar'
+  input <- readLine'
   let ofst = toOffset turn
   let pos = toPosition turn ofst
-  if input == '\t'
+  if input == "\ESC[C"
     then do
       goto' pos
       let nextOfst = toOffset (nextTurn turn)
@@ -134,7 +134,7 @@ processInput turn = do
           (turn, pos) <- processInput (nextTurn turn)
           return (turn, pos)
     else
-      if input == '\n'
+      if input == " "
         then do
           goto' pos
           return (turn, pos)
@@ -175,7 +175,7 @@ run' g p turn
             | otherwise = (gridSize * gridSize) - 1
       case move g index p of
         [] -> do
-          printMsg pos "ERROR: Invalid move"
+          -- printMsg pos "ERROR: Invalid move"
           run' g p turn
         [g'] -> do
           run g' (next p) pos

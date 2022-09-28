@@ -8,8 +8,11 @@ module Life
     convertToBoard,
     isPrime,
     clearScn,
+    printGotos,
   )
 where
+
+import Control.Concurrent
 
 type Pos = (Int, Int)
 
@@ -39,6 +42,12 @@ writeAt position string = do
 
 goto' :: Pos -> IO ()
 goto' (x, y) = putStr ("\ESC[" ++ show y ++ ";" ++ show x ++ "H")
+
+printGotos :: Int -> Int -> IO ()
+printGotos x y = do
+  goto' (x, y)
+  putChar '*'
+  threadDelay 100
 
 printBoard :: Board -> IO ()
 printBoard board = sequence_ [writeAt position cellShape | position <- board]
