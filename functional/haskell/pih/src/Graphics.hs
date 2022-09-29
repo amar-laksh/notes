@@ -1,6 +1,8 @@
-module Graphics (getTermSize, Seqs (..), subStrIndexes, chunkStr', getValue') where
+module Graphics (getTermSize, Seqs (..), subStrIndexes, chunkStr', getValue', findPositions', getSubStr', getNonMatchedStr, replace') where
 
+import Data.Char
 import Data.Either
+import Data.List (sortBy)
 import Data.Maybe
 import System.Process (readProcess)
 
@@ -40,9 +42,6 @@ getValue' k t = listToMaybe [v | (k', v) <- t, k == k']
 
 -- getMap::Int -> String -> Either Int String
 -- getMap k v  = either (const k) (const k) k
---
--- replace::String -> String -> String
--- replace oldNeedle newNeedle haystack =
 
 getSubStr' :: Int -> Int -> String -> [Char]
 getSubStr' start end str = [sub | (index, sub) <- zip [0 ..] str, index >= start, index <= end]
@@ -60,5 +59,18 @@ chunkStr' chunkSize haystack = zip indexes (getSubStrs' indexes haystack)
   where
     indexes = subStrIndexes chunkSize haystack
 
--- replace'::String -> String -> String
--- replace' this forThis inThis =
+findPositions' :: String -> String -> [Int]
+findPositions' needle haystack = concat [fst chunk | chunk <- chunks, snd chunk == needle]
+  where
+    chunks = chunkStr' (length needle) haystack
+
+getNonMatchedStr :: String -> String -> [(Int, Char)]
+getNonMatchedStr this inThis = [(i, c) | (i, c) <- zip [0 ..] inThis, i `notElem` replacePositions]
+  where
+    replacePositions = findPositions' this inThis
+
+replace' :: String -> String -> String -> String
+replace' this forThis inThis = map snd (sortBy (\(a, _) (b, _) -> compare a b) (nonMatched ++ replacement))
+  where
+    nonMatched = getNonMatchedStr this inThis
+    replacement = zip (findPositions' this inThis) (cycle forThis)
