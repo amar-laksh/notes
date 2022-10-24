@@ -1,6 +1,4 @@
 #include <eop.hpp>
 #include <iostream>
 
-namespace eop {
-
-}
+namespace eop {}

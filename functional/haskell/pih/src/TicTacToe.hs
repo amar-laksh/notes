@@ -15,9 +15,11 @@ import Data.Char (digitToInt)
 import Data.List
 import Life (clearScn, goto')
 
+-- Grapgics section
 gridSize :: Int
 gridSize = 3
 
+-- Game section
 data Player = O | B | X deriving (Eq, Ord, Show)
 
 type Grid = [[Player]]
@@ -152,7 +154,7 @@ getNat turn = do
       return (turn, pos)
 
 tictactoe :: IO ()
-tictactoe = run empty O (10, 3)
+tictactoe = run empty O (20, 10)
 
 run :: Grid -> Player -> (Int, Int) -> IO ()
 run g p pos = do

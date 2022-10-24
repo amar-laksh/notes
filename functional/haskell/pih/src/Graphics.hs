@@ -1,4 +1,4 @@
-module Graphics (getTermSize, Seqs (..), subStrIndexes, chunkStr', getValue', findPositions', getSubStr', getNonMatchedStr, replace') where
+module Graphics (getTermSize, replace', goto, inHead, clearScn, getCapSeq, drawLine, toLineSymbol, Line (..)) where
 
 import Data.Char
 import Data.Either
@@ -6,71 +6,72 @@ import Data.List (sortBy)
 import Data.Maybe
 import System.Process (readProcess)
 
+-- Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
+-- man 5 terminfo
+-- man 1 tput
+type Pos = (Int, Int)
+
 getTermSize :: IO [String]
 getTermSize = do
   size <- readProcess "tput" ["cols", "lines"] []
   return (words size)
 
+getCapSeq :: [String] -> IO String
+getCapSeq capname = do
+  readProcess "tput" capname []
+
+printCapSeq :: [String] -> IO ()
+printCapSeq capname = do
+  getCapSeq capname >>= \s -> putStr s
+
 clearScn :: IO ()
-clearScn = putStr (getValue Clear)
+clearScn = do
+  getCapSeq ["clear"] >>= \s -> putStr s
 
-type Pos = (Int, Int)
+goto :: Pos -> IO ()
+goto (x, y) = printCapSeq ["cup", show x, show y]
 
--- goto' :: Pos -> IO ()
--- goto' (x, y) = do
---   let r = map (\c -> if c == "0" then show x else if c == "1" then show y else c)
---   print (replace "" (getValue Goto))
---   print (replace "hello")
---
-type Assoc k v = [(k, v)]
+plot :: Pos -> IO ()
+plot p = do
+  goto p
+  putStr "*"
 
-data Seqs
-  = Clear
-  | Goto
-  deriving (Eq, Show)
+savePos :: IO ()
+savePos = printCapSeq ["sc"]
 
-type Table = Assoc Seqs String
+restorePos :: IO ()
+restorePos = printCapSeq ["rc"]
 
-seqs :: Table
-seqs = [(Clear, "\ESC[2J"), (Goto, "\ESC[0;1H")]
+-- Lines generation algorithm
+data Line = HLine | VLine | DLLine | DRLine deriving (Show, Eq, Ord)
 
-getValue :: Seqs -> String
-getValue k = fromMaybe "" (getValue' k seqs)
+toLineSymbol :: Line -> Char
+toLineSymbol HLine = '-'
+toLineSymbol VLine = '|'
+toLineSymbol DLLine = '\\'
+toLineSymbol DRLine = '/'
 
-getValue' :: (Eq k) => k -> Assoc k v -> Maybe v
-getValue' k t = listToMaybe [v | (k', v) <- t, k == k']
+drawLine :: (Pos, Pos) -> IO ()
+drawLine ((x1, y1), (x2, y2)) = do
+  let dx = x2 - x1
+  let dy = y2 - y1
+  let d = 2 * dy - dx
+  let y = y1
+  sequence_ [plot (x, (y1 + dx * (x - x1)) `div` dx) | x <- [x1 .. x2]]
 
--- getMap::Int -> String -> Either Int String
--- getMap k v  = either (const k) (const k) k
+-- TODO put string manipulation in different module
+inHead :: String -> String -> Bool
+inHead needle haystack = take (length needle) haystack == needle
 
-getSubStr' :: Int -> Int -> String -> [Char]
-getSubStr' start end str = [sub | (index, sub) <- zip [0 ..] str, index >= start, index <= end]
-
-getSubStrs' :: [[Int]] -> String -> [String]
-getSubStrs' indexes haystack = [getSubStr' (head index) (last index) haystack | index <- indexes, not (null index)]
-
-subStrIndexes :: Int -> String -> [[Int]]
-subStrIndexes size haystack
-  | size > 1 = [indices | l <- [0 .. length haystack - 2], indices <- replicate 1 [l .. l + size - 1], last indices < length haystack]
-  | otherwise = [indices | l <- [0 .. length haystack - 2], indices <- replicate 1 [l .. l + size - 1], last indices < length haystack] ++ [[length haystack - 1]]
-
-chunkStr' :: Int -> String -> [([Int], String)]
-chunkStr' chunkSize haystack = zip indexes (getSubStrs' indexes haystack)
+substring :: [Char] -> [Char] -> Bool
+substring l s = check' s l True
   where
-    indexes = subStrIndexes chunkSize haystack
-
-findPositions' :: String -> String -> [Int]
-findPositions' needle haystack = concat [fst chunk | chunk <- chunks, snd chunk == needle]
-  where
-    chunks = chunkStr' (length needle) haystack
-
-getNonMatchedStr :: String -> String -> [(Int, Char)]
-getNonMatchedStr this inThis = [(i, c) | (i, c) <- zip [0 ..] inThis, i `notElem` replacePositions]
-  where
-    replacePositions = findPositions' this inThis
+    check' _ [] h = True
+    check' [] _ h = False
+    check' (x : xs) (y : ys) h = (y == x && check' xs ys False) || (h && check' xs (y : ys) h)
 
 replace' :: String -> String -> String -> String
-replace' this forThis inThis = map snd (sortBy (\(a, _) (b, _) -> compare a b) (nonMatched ++ replacement))
-  where
-    nonMatched = getNonMatchedStr this inThis
-    replacement = zip (findPositions' this inThis) (cycle forThis)
+replace' needle replacement [] = []
+replace' needle replacement haystack
+  | inHead needle haystack = replacement ++ replace' needle replacement (drop (length needle) haystack)
+  | not (inHead needle haystack) = head haystack : replace' needle replacement (tail haystack)

@@ -43,6 +43,7 @@ library
       Life
       Nim
       TautologyChecker
+      Term
       TicTacToe
   other-modules:
       Paths_pih
