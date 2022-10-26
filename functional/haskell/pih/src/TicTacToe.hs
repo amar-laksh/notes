@@ -7,6 +7,11 @@ module TicTacToe
     mixVLines,
     getNat,
     tictactoe,
+    fromPosition,
+    hline',
+    hline,
+    vline,
+    putTicTacToeGrid,
   )
 where
 
@@ -15,9 +20,40 @@ import Data.Char (digitToInt)
 import Data.List
 import Life (clearScn, goto')
 
--- Grapgics section
-gridSize :: Int
-gridSize = 3
+-- Graphics section
+
+-- Each cell size in the grid
+gridCellSize :: Int
+gridCellSize = 3
+
+hline' :: (Int, Int) -> IO ()
+hline' pos = do
+  goto' pos
+  putStr "-"
+
+vline' :: (Int, Int) -> IO ()
+vline' pos = do
+  goto' pos
+  putStr "|"
+
+vline :: Int -> Int -> Int -> Int -> IO ()
+vline cellSize gridSize x dy = do
+  sequence_ [vline' (x, y) | y <- [dy .. dy + (cellSize * gridSize + 1)]]
+  goto' (0, 0)
+
+hline :: Int -> Int -> Int -> Int -> IO ()
+hline cellSize gridSize y dx = do
+  print (y, dx)
+  sequence_ [hline' (x, y) | x <- [dx .. dx + (cellSize * gridSize + 1)]]
+  goto' (0, 0)
+
+putTicTacToeGrid :: Int -> Int -> (Int, Int) -> IO ()
+putTicTacToeGrid cellSize gridSize pos = do
+  sequence_ [vline cellSize gridSize (originX + dx * cellSize) originY | dx <- [1 .. gridSize - 1]]
+  sequence_ [hline cellSize gridSize (originY + dy * cellSize) originX | dy <- [1 .. gridSize - 1]]
+  where
+    originX = fst pos
+    originY = snd pos
 
 -- Game section
 data Player = O | B | X deriving (Eq, Ord, Show)
@@ -28,6 +64,8 @@ next :: Player -> Player
 next O = X
 next B = B
 next X = O
+
+gridSize = 3
 
 empty :: Grid
 empty = replicate gridSize (replicate gridSize B)
@@ -154,12 +192,13 @@ getNat turn = do
       return (turn, pos)
 
 tictactoe :: IO ()
-tictactoe = run empty O (20, 10)
+tictactoe = run empty O (10, 3)
 
 run :: Grid -> Player -> (Int, Int) -> IO ()
 run g p pos = do
+  -- Reset screen
   clearScn
-  goto' (1, 1)
+  goto' (0, 0)
   putGrid g
   goto' pos
   run' g p (nextTurn (fst (fromPosition pos)))
