@@ -1,21 +1,16 @@
 module TicTacToe
   ( Player (..),
     toSymbol,
-    toGraphicGrid,
     putGrid,
-    interleaveVLines,
-    mixVLines,
     getNat,
     tictactoe,
-    fromPosition,
-    hline',
-    hline,
-    vline,
-    putTicTacToeGrid,
+    winFor,
+    moveGrid,
   )
 where
 
 import Chapter10 (getChar', readLine')
+import Control.Concurrent
 import Data.Char (digitToInt)
 import Data.List
 import Life (clearScn, goto')
@@ -38,24 +33,78 @@ vline' pos = do
 
 vline :: Int -> Int -> Int -> Int -> IO ()
 vline cellSize gridSize x dy = do
-  sequence_ [vline' (x, y) | y <- [dy .. dy + (cellSize * gridSize + 1)]]
+  sequence_ [vline' (x, y) | y <- [dy .. dy + (cellSize * gridSize)]]
   goto' (0, 0)
 
 hline :: Int -> Int -> Int -> Int -> IO ()
 hline cellSize gridSize y dx = do
-  print (y, dx)
-  sequence_ [hline' (x, y) | x <- [dx .. dx + (cellSize * gridSize + 1)]]
+  sequence_ [hline' (x, y) | x <- [dx .. dx + (cellSize * gridSize)]]
   goto' (0, 0)
 
-putTicTacToeGrid :: Int -> Int -> (Int, Int) -> IO ()
-putTicTacToeGrid cellSize gridSize pos = do
-  sequence_ [vline cellSize gridSize (originX + dx * cellSize) originY | dx <- [1 .. gridSize - 1]]
-  sequence_ [hline cellSize gridSize (originY + dy * cellSize) originX | dy <- [1 .. gridSize - 1]]
+putTicTacToeGrid :: Int -> Int -> (Int, Int) -> Grid -> IO ()
+putTicTacToeGrid cellSize gridSize pos grid = do
+  sequence_ [vline cellSize gridSize (originX + dx * cellSize) originY | dx <- gridLines]
+  sequence_ [hline cellSize gridSize (originY + dy * cellSize) originX | dy <- gridLines]
+  putPlayerGrid cellSize pos grid
   where
     originX = fst pos
     originY = snd pos
+    gridLines = [1 .. gridSize - 1]
+
+moveGrid' :: (Int, Int) -> IO ()
+moveGrid' (x, y) = do
+  goto' (0, 0)
+  threadDelay 20000
+  clearScn
+  putTicTacToeGrid 5 3 (x, y) [[O, O, X], [X, X, O], [X, B, X]]
+
+-- TODO : Fix this to be correct
+moveGrid :: (Int, Int) -> (Int, Int) -> IO ()
+moveGrid origin dest = do
+  if (fst origin /= fst dest) || (snd origin /= snd dest)
+    then do
+      if (fst dest < fst origin) || (snd dest < snd origin)
+        then do
+          sequence_ [moveGrid' (x, y) | (x, y) <- zip (reverse pathX) (reverse pathY)]
+        else do
+          sequence_ [moveGrid' (x, y) | (x, y) <- zip pathX pathY]
+    else do
+      sequence_ [moveGrid' (x, y) | x <- pathX, y <- pathY]
+  where
+    pathX = [fst origin .. fst dest]
+    pathY = [snd origin .. snd dest]
+
+putPlayer :: (Int, Int) -> Player -> IO ()
+putPlayer pos p = do
+  goto' pos
+  putStr (toSymbol p)
+  goto' (0, 0)
+
+putPlayerRow :: (Int, Int) -> Int -> [Player] -> IO ()
+putPlayerRow (x, y) offset playerRow = do
+  sequence_ [putPlayer (x + (offset * row), y) p | (row, p) <- zip rows playerRow]
+  where
+    rows = [0 .. (length playerRow)]
+
+putPlayerGrid :: Int -> (Int, Int) -> Grid -> IO ()
+putPlayerGrid cellSize pos grid = do
+  sequence_ [putPlayerRow (originX + symbolOffset, originY + (offsetY * column)) cellSize line | (column, line) <- zip gridColumns grid]
+  where
+    symbolOffset = cellSize `div` 2
+    offsetY = cellSize
+    originX = fst pos
+    originY = snd pos + symbolOffset
+    gridColumns = [0 .. (length grid)]
 
 -- Game section
+--
+-- Game config
+gridSize = 3
+
+cellSize = 6
+
+origin = (50, 10)
+
 data Player = O | B | X deriving (Eq, Ord, Show)
 
 type Grid = [[Player]]
@@ -64,8 +113,6 @@ next :: Player -> Player
 next O = X
 next B = B
 next X = O
-
-gridSize = 3
 
 empty :: Grid
 empty = replicate gridSize (replicate gridSize B)
@@ -97,34 +144,12 @@ won grid = winFor O grid || winFor X grid
 toSymbol :: Player -> String
 toSymbol O = "⭕"
 toSymbol X = "❌"
-toSymbol B = " "
+toSymbol B = "  "
 
 interleave xs ys = concatMap (\(x, y) -> [x, y]) (zip xs ys)
 
-interleaveVLines :: [Char] -> Char -> [Char]
-interleaveVLines row chr = init (interleave row (replicate (length row) chr))
-
-mixVLine :: [Char] -> [Char]
-mixVLine row = "\t" ++ interleaveVLines (interleaveVLines row '|') '\t'
-
-mixVLines :: [[Char]] -> [[Char]]
-mixVLines rows = [mixVLine row | row <- rows]
-
-addHLines' :: [Char] -> [Char]
-addHLines' row = replicate (length row * 5) '-'
-
-mixLines :: [[Char]] -> [[Char]]
-mixLines grid = paddingVLines ++ init (interleave rowWithVLines (replicate gridSize (addHLines' (head rowWithVLines)))) ++ paddingVLines
-  where
-    paddingVLines = replicate (gridSize - 1) paddingVLine
-    paddingVLine = mixVLine (replicate (length (head grid)) ' ')
-    rowWithVLines = mixVLines grid
-
-toGraphicGrid :: Grid -> [String]
-toGraphicGrid grid = mixLines [concatMap toSymbol c | c <- grid]
-
 putGrid :: Grid -> IO ()
-putGrid grid = mapM_ putStrLn (toGraphicGrid grid)
+putGrid = putTicTacToeGrid cellSize gridSize origin
 
 validMove :: Grid -> Int -> Bool
 validMove grid index = index >= 0 && index < gridSize ^ 2 && concat grid !! index == B
