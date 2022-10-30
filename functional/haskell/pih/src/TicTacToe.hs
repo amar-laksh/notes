@@ -6,6 +6,7 @@ module TicTacToe
     tictactoe,
     winFor,
     moveGrid,
+    putTicTacToeGrid,
   )
 where
 
@@ -21,27 +22,45 @@ import Life (clearScn, goto')
 gridCellSize :: Int
 gridCellSize = 3
 
-hline' :: (Int, Int) -> IO ()
+putPlayer' :: Position -> Player -> IO ()
+putPlayer' pos p = do
+  goto' pos
+  putStr (toSymbol p)
+
+putPlayerRow :: Position -> Int -> [Player] -> IO ()
+putPlayerRow (x, y) offset players = do
+  sequence_ [putPlayer' (x + (offset * row), y) player | (row, player) <- zip rows players]
+  where
+    rows = [0 .. (length players)]
+
+putPlayerGrid :: Int -> Position -> Grid -> IO ()
+putPlayerGrid cellSize pos grid = do
+  sequence_ [putPlayerRow (originX, originY + (cellSize * column)) cellSize row | (column, row) <- zip gridColumns grid]
+  where
+    symbolOffset = cellSize `div` 2
+    originX = fst pos + symbolOffset
+    originY = snd pos + symbolOffset
+    gridColumns = [0 .. (length grid)]
+
+hline' :: Position -> IO ()
 hline' pos = do
   goto' pos
   putStr "-"
 
-vline' :: (Int, Int) -> IO ()
+vline' :: Position -> IO ()
 vline' pos = do
   goto' pos
   putStr "|"
 
 vline :: Int -> Int -> Int -> Int -> IO ()
-vline cellSize gridSize x dy = do
-  sequence_ [vline' (x, y) | y <- [dy .. dy + (cellSize * gridSize)]]
-  goto' (0, 0)
+vline cellSize gridSize x offset = do
+  sequence_ [vline' (x, y) | y <- [offset .. offset + (cellSize * gridSize)]]
 
 hline :: Int -> Int -> Int -> Int -> IO ()
-hline cellSize gridSize y dx = do
-  sequence_ [hline' (x, y) | x <- [dx .. dx + (cellSize * gridSize)]]
-  goto' (0, 0)
+hline cellSize gridSize y offset = do
+  sequence_ [hline' (x, y) | x <- [offset .. offset + (cellSize * gridSize)]]
 
-putTicTacToeGrid :: Int -> Int -> (Int, Int) -> Grid -> IO ()
+putTicTacToeGrid :: Int -> Int -> Position -> Grid -> IO ()
 putTicTacToeGrid cellSize gridSize pos grid = do
   sequence_ [vline cellSize gridSize (originX + dx * cellSize) originY | dx <- gridLines]
   sequence_ [hline cellSize gridSize (originY + dy * cellSize) originX | dy <- gridLines]
@@ -51,50 +70,34 @@ putTicTacToeGrid cellSize gridSize pos grid = do
     originY = snd pos
     gridLines = [1 .. gridSize - 1]
 
-moveGrid' :: (Int, Int) -> IO ()
+-- TODO : Fix this to be correct
+moveGrid' :: Position -> IO ()
 moveGrid' (x, y) = do
   goto' (0, 0)
   threadDelay 20000
   clearScn
   putTicTacToeGrid 5 3 (x, y) [[O, O, X], [X, X, O], [X, B, X]]
 
--- TODO : Fix this to be correct
-moveGrid :: (Int, Int) -> (Int, Int) -> IO ()
+moveGrid :: Position -> Position -> IO ()
 moveGrid origin dest = do
-  if (fst origin /= fst dest) || (snd origin /= snd dest)
+  if (fst origin /= fst dest) && (snd origin /= snd dest)
     then do
       if (fst dest < fst origin) || (snd dest < snd origin)
         then do
-          sequence_ [moveGrid' (x, y) | (x, y) <- zip (reverse pathX) (reverse pathY)]
+          sequence_ [moveGrid' (x, y) | (x, y) <- zip (reverse inversePathX) (reverse inversePathY)]
         else do
           sequence_ [moveGrid' (x, y) | (x, y) <- zip pathX pathY]
     else do
-      sequence_ [moveGrid' (x, y) | x <- pathX, y <- pathY]
+      if (fst dest < fst origin) || (snd dest < snd origin)
+        then do
+          sequence_ [moveGrid' (x, y) | x <- reverse inversePathX, y <- reverse inversePathY]
+        else do
+          sequence_ [moveGrid' (x, y) | x <- pathX, y <- pathY]
   where
     pathX = [fst origin .. fst dest]
     pathY = [snd origin .. snd dest]
-
-putPlayer :: (Int, Int) -> Player -> IO ()
-putPlayer pos p = do
-  goto' pos
-  putStr (toSymbol p)
-  goto' (0, 0)
-
-putPlayerRow :: (Int, Int) -> Int -> [Player] -> IO ()
-putPlayerRow (x, y) offset playerRow = do
-  sequence_ [putPlayer (x + (offset * row), y) p | (row, p) <- zip rows playerRow]
-  where
-    rows = [0 .. (length playerRow)]
-
-putPlayerGrid :: Int -> (Int, Int) -> Grid -> IO ()
-putPlayerGrid cellSize pos grid = do
-  sequence_ [putPlayerRow (originX + symbolOffset, originY + (offsetY * column)) cellSize line | (column, line) <- zip gridColumns grid]
-  where
-    symbolOffset = cellSize `div` 2
-    offsetY = cellSize
-    originX = fst pos
-    originY = snd pos + symbolOffset
-    gridColumns = [0 .. (length grid)]
+    inversePathX = [fst dest .. fst origin]
+    inversePathY = [snd dest .. snd origin]
 
 -- Game section
 --
@@ -104,6 +107,8 @@ gridSize = 3
 cellSize = 6
 
 origin = (50, 10)
+
+type Position = (Int, Int)
 
 data Player = O | B | X deriving (Eq, Ord, Show)
 
@@ -163,10 +168,10 @@ chop :: Int -> [a] -> [[a]]
 chop n [] = []
 chop n xs = take n xs : chop n (drop n xs)
 
-toPosition :: Int -> Int -> (Int, Int)
+toPosition :: Int -> Int -> Position
 toPosition turn offset = (turn - (15 * (offset * gridSize)), gridSize + (offset * 2))
 
-fromPosition :: (Int, Int) -> (Int, Int)
+fromPosition :: Position -> Position
 fromPosition (x, y) = (turn, offset)
   where
     offset = (y - gridSize) `div` 2
@@ -181,7 +186,7 @@ nextTurn turn = turn + 15
 prevTurn :: Int -> Int
 prevTurn turn = turn - 15
 
-processInput :: Int -> IO (Int, (Int, Int))
+processInput :: Int -> IO (Int, Position)
 processInput turn = do
   input <- readLine'
   let ofst = toOffset turn
@@ -206,7 +211,7 @@ processInput turn = do
         else do
           return (-1, pos)
 
-getNat :: Int -> IO (Int, (Int, Int))
+getNat :: Int -> IO (Int, Position)
 getNat turn = do
   if toOffset turn == gridSize && fst (toPosition turn (toOffset turn)) == 10
     then do
@@ -219,7 +224,7 @@ getNat turn = do
 tictactoe :: IO ()
 tictactoe = run empty O (10, 3)
 
-run :: Grid -> Player -> (Int, Int) -> IO ()
+run :: Grid -> Player -> Position -> IO ()
 run g p pos = do
   -- Reset screen
   clearScn
@@ -249,7 +254,7 @@ run' g p turn
 prompt :: Player -> String
 prompt p = "Player " ++ show p ++ ", enter your move: "
 
-printMsg :: (Int, Int) -> String -> IO ()
+printMsg :: Position -> String -> IO ()
 printMsg pos msg = do
   goto' (gridSize * gridSize * 10, 1)
   putStrLn msg
