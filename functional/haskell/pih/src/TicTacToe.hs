@@ -22,14 +22,14 @@ import Life (clearScn, goto')
 gridCellSize :: Int
 gridCellSize = 3
 
-putPlayer' :: Position -> Player -> IO ()
-putPlayer' pos p = do
+putStringAt :: Position -> String -> IO ()
+putStringAt pos symbol = do
   goto' pos
-  putStr (toSymbol p)
+  putStr symbol
 
 putPlayerRow :: Position -> Int -> [Player] -> IO ()
 putPlayerRow (x, y) offset players = do
-  sequence_ [putPlayer' (x + (offset * row), y) player | (row, player) <- zip rows players]
+  sequence_ [putStringAt (x + (offset * row), y) (toSymbol player) | (row, player) <- zip rows players]
   where
     rows = [0 .. (length players)]
 
@@ -42,33 +42,22 @@ putPlayerGrid cellSize pos grid = do
     originY = snd pos + symbolOffset
     gridColumns = [0 .. (length grid)]
 
-hline' :: Position -> IO ()
-hline' pos = do
-  goto' pos
-  putStr "-"
-
-vline' :: Position -> IO ()
-vline' pos = do
-  goto' pos
-  putStr "|"
-
-vline :: Int -> Int -> Int -> Int -> IO ()
-vline cellSize gridSize x offset = do
-  sequence_ [vline' (x, y) | y <- [offset .. offset + (cellSize * gridSize)]]
-
-hline :: Int -> Int -> Int -> Int -> IO ()
-hline cellSize gridSize y offset = do
-  sequence_ [hline' (x, y) | x <- [offset .. offset + (cellSize * gridSize)]]
+putLine :: Int -> Int -> Int -> Int -> ((Int, Int) -> IO ()) -> IO ()
+putLine cellSize gridSize y offset fn = do
+  sequence_ [fn (x, y) | x <- [offset .. offset + (cellSize * gridSize)]]
 
 putTicTacToeGrid :: Int -> Int -> Position -> Grid -> IO ()
 putTicTacToeGrid cellSize gridSize pos grid = do
-  sequence_ [vline cellSize gridSize (originX + dx * cellSize) originY | dx <- gridLines]
-  sequence_ [hline cellSize gridSize (originY + dy * cellSize) originX | dy <- gridLines]
+  sequence_ [putLine cellSize gridSize (originX + dx * cellSize) originY putHLine | dx <- gridLines]
+  sequence_ [putLine cellSize gridSize (originY + dy * cellSize) originX putVLine | dy <- gridLines]
   putPlayerGrid cellSize pos grid
+  goto' (0, 0)
   where
     originX = fst pos
     originY = snd pos
     gridLines = [1 .. gridSize - 1]
+    putHLine (x, y) = putStringAt (y, x) "|"
+    putVLine (x, y) = putStringAt (x, y) "-"
 
 -- TODO : Fix this to be correct
 moveGrid' :: Position -> IO ()
