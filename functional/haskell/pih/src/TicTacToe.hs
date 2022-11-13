@@ -48,16 +48,23 @@ putLine cellSize gridSize y offset fn = do
 
 putTicTacToeGrid :: Int -> Int -> Position -> Grid -> IO ()
 putTicTacToeGrid cellSize gridSize pos grid = do
-  sequence_ [putLine cellSize gridSize (originX + dx * cellSize) originY putHLine | dx <- gridLines]
-  sequence_ [putLine cellSize gridSize (originY + dy * cellSize) originX putVLine | dy <- gridLines]
+  sequence_ [putLine cellSize gridSize (originX + dx * cellSize) originY hLine | dx <- gridLines]
+  sequence_ [putLine cellSize gridSize (originY + dy * cellSize) originX vLine | dy <- gridLines]
   putPlayerGrid cellSize pos grid
   goto' (0, 0)
   where
     originX = fst pos
     originY = snd pos
     gridLines = [1 .. gridSize - 1]
-    putHLine (x, y) = putStringAt (y, x) "|"
-    putVLine (x, y) = putStringAt (x, y) "-"
+    hLine (x, y) = putStringAt (y, x) "|"
+    vLine (x, y) = putStringAt (x, y) "-"
+
+--
+-- takePlayerFromGrid:: Int -> Int -> Position -> IO (Grid)
+-- takePlayerFromGrid cellSize gridSize pos = do
+--   let g =
+--   return Grid
+--
 
 -- TODO : Fix this to be correct
 moveGrid' :: Position -> IO ()
@@ -95,7 +102,7 @@ gridSize = 3
 
 cellSize = 6
 
-origin = (50, 10)
+origin = (30, 10)
 
 type Position = (Int, Int)
 
@@ -228,17 +235,14 @@ run' g p turn
   | winFor X g = printMsg (toPosition turn (toOffset turn)) "Player X wins!\n"
   | isFull g = printMsg (toPosition turn (toOffset turn)) "It's a draw!\n"
   | otherwise = do
+      -- TODO:  make a getNat that works with arrows and returns the index
       (turn, pos) <- getNat turn
-      let t = turn `div` 15
-      let index
-            | t > 0 = t - 1
-            | otherwise = (gridSize * gridSize) - 1
-      case move g index p of
+      case move g 3 p of
         [] -> do
           -- printMsg pos "ERROR: Invalid move"
           run' g p turn
-        [g'] -> do
-          run g' (next p) pos
+        g' -> do
+          run (head g') (next p) pos
 
 prompt :: Player -> String
 prompt p = "Player " ++ show p ++ ", enter your move: "
