@@ -9,7 +9,7 @@ import System.Process (readProcess)
 -- Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
 -- man 5 terminfo
 -- man 1 tput
-type Pos = (Int, Int)
+type Position = (Int, Int)
 
 getTermSize :: IO [String]
 getTermSize = do
@@ -28,10 +28,10 @@ clearScn :: IO ()
 clearScn = do
   getCapSeq ["clear"] >>= \s -> putStr s
 
-goto :: Pos -> IO ()
+goto :: Position -> IO ()
 goto (x, y) = putStr ("\ESC[" ++ show y ++ ";" ++ show x ++ "H")
 
-plot :: Pos -> IO ()
+plot :: Position -> IO ()
 plot p = do
   goto p
   putStr "*"

@@ -7,6 +7,7 @@ module TicTacToe
     winFor,
     moveGrid,
     putTicTacToeGrid,
+    getPlayerGrid,
   )
 where
 
@@ -25,8 +26,8 @@ gridCellSize :: Int
 gridCellSize = 3
 
 putStringAt :: Position -> String -> IO ()
-putStringAt pos symbol = do
-  goto pos
+putStringAt position symbol = do
+  goto position
   putStr symbol
 
 getPlayerRow :: Position -> Int -> [Player] -> [Position]
@@ -36,49 +37,43 @@ getPlayerRow (x, y) offset players = do
     rows = [0 .. (length players)]
 
 getPlayerGrid :: Int -> Position -> Grid -> [[Position]]
-getPlayerGrid cellSize pos grid = do
+getPlayerGrid cellSize position grid = do
   [getPlayerRow (originX, originY + (cellSize * column)) cellSize row | (column, row) <- zip gridColumns grid]
   where
+    -- We put the symbols in the middle of the cell
     symbolOffset = cellSize `div` 2
-    originX = fst pos + symbolOffset
-    originY = snd pos + symbolOffset
+    originX = fst position + symbolOffset
+    originY = snd position + symbolOffset
     gridColumns = [0 .. (length grid)]
 
 putPlayerRow :: Position -> Int -> [Player] -> IO ()
 putPlayerRow (x, y) offset players = do
-  sequence_ [putStringAt pos (toSymbol player) | (pos, player) <- zip positions players]
+  sequence_ [putStringAt position (toSymbol player) | (position, player) <- zip positions players]
   where
     positions = getPlayerRow (x, y) offset players
 
 putPlayerGrid :: Int -> Position -> Grid -> IO ()
-putPlayerGrid cellSize pos grid = do
+putPlayerGrid cellSize position grid = do
   sequence_ [putPlayerRow (head playerRows) cellSize row | (playerRows, row) <- zip playerGrid grid]
   where
-    playerGrid = getPlayerGrid cellSize pos grid
+    playerGrid = getPlayerGrid cellSize position grid
 
-putLine :: Int -> Int -> Int -> Int -> ((Int, Int) -> IO ()) -> IO ()
+putLine :: Int -> Int -> Int -> Int -> (Position -> IO ()) -> IO ()
 putLine cellSize gridSize y offset fn = do
   sequence_ [fn (x, y) | x <- [offset .. offset + (cellSize * gridSize)]]
 
 putTicTacToeGrid :: Int -> Int -> Position -> Grid -> IO ()
-putTicTacToeGrid cellSize gridSize pos grid = do
+putTicTacToeGrid cellSize gridSize position grid = do
   sequence_ [putLine cellSize gridSize (originX + dx * cellSize) originY hLine | dx <- gridLines]
   sequence_ [putLine cellSize gridSize (originY + dy * cellSize) originX vLine | dy <- gridLines]
-  putPlayerGrid cellSize pos grid
+  putPlayerGrid cellSize position grid
   goto (0, 0)
   where
-    originX = fst pos
-    originY = snd pos
+    originX = fst position
+    originY = snd position
     gridLines = [1 .. gridSize - 1]
     hLine (x, y) = putStringAt (y, x) "|"
     vLine (x, y) = putStringAt (x, y) "-"
-
---
--- takePlayerFromGrid:: Int -> Int -> Position -> IO (Grid)
--- takePlayerFromGrid cellSize gridSize pos = do
---   let g =
---   return Grid
---
 
 -- TODO : Fix this to be correct
 moveGrid' :: Position -> IO ()
