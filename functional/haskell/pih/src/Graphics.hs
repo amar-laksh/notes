@@ -1,4 +1,4 @@
-module Graphics (getTermSize, replace', goto, inHead, clearScn, getCapSeq, drawLine, toLineSymbol, Line (..)) where
+module Graphics (getTermSize, replace', goto, inHead, clearScn, getCapSeq, toLineSymbol, Line (..)) where
 
 import Data.Char
 import Data.Either
@@ -29,7 +29,7 @@ clearScn = do
   getCapSeq ["clear"] >>= \s -> putStr s
 
 goto :: Pos -> IO ()
-goto (x, y) = printCapSeq ["cup", show x, show y]
+goto (x, y) = putStr ("\ESC[" ++ show y ++ ";" ++ show x ++ "H")
 
 plot :: Pos -> IO ()
 plot p = do
@@ -50,14 +50,6 @@ toLineSymbol HLine = '-'
 toLineSymbol VLine = '|'
 toLineSymbol DLLine = '\\'
 toLineSymbol DRLine = '/'
-
-drawLine :: (Pos, Pos) -> IO ()
-drawLine ((x1, y1), (x2, y2)) = do
-  let dx = x2 - x1
-  let dy = y2 - y1
-  let d = 2 * dy - dx
-  let y = y1
-  sequence_ [plot (x, (y1 + dx * (x - x1)) `div` dx) | x <- [x1 .. x2]]
 
 -- TODO put string manipulation in different module
 inHead :: String -> String -> Bool
