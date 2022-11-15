@@ -1,5 +1,5 @@
 module TicTacToe
-  ( Player (..),
+  ( Symbol (..),
     toSymbol,
     putGrid,
     getNat,
@@ -7,7 +7,6 @@ module TicTacToe
     winFor,
     moveGrid,
     putTicTacToeGrid,
-    getPlayerGrid,
   )
 where
 
@@ -17,60 +16,54 @@ import Data.Char (digitToInt)
 import Data.List
 import Graphics (clearScn, goto)
 
--- import Life (goto)
-
 -- Graphics section
 
--- Each cell size in the grid
-gridCellSize :: Int
-gridCellSize = 3
+-- Pure functions; we can test these exhaustively!
+symGridRow :: Position -> Int -> Int -> [Position]
+symGridRow (x, y) gridOffset numOfSymbols = do
+  [(x + (gridOffset * row), y) | row <- [0 .. numOfSymbols - 1]]
 
-putStringAt :: Position -> String -> IO ()
-putStringAt position symbol = do
-  goto position
-  putStr symbol
-
-getPlayerRow :: Position -> Int -> [Player] -> [Position]
-getPlayerRow (x, y) offset players = do
-  [(x + (offset * row), y) | row <- rows]
-  where
-    rows = [0 .. (length players)]
-
-getPlayerGrid :: Int -> Position -> Grid -> [[Position]]
-getPlayerGrid cellSize position grid = do
-  [getPlayerRow (originX, originY + (cellSize * column)) cellSize row | (column, row) <- zip gridColumns grid]
+symGridPositions :: Int -> Position -> Int -> [[Position]]
+symGridPositions cellSize position numOfSymbols = do
+  [symGridRow (originX, originY + (cellSize * column)) cellSize numOfSymbols | column <- columns]
   where
     -- We put the symbols in the middle of the cell
     symbolOffset = cellSize `div` 2
     originX = fst position + symbolOffset
     originY = snd position + symbolOffset
-    gridColumns = [0 .. (length grid)]
+    columns = [0 .. numOfSymbols - 1]
 
-putPlayerRow :: Position -> Int -> [Player] -> IO ()
-putPlayerRow (x, y) offset players = do
-  sequence_ [putStringAt position (toSymbol player) | (position, player) <- zip positions players]
+-- Monadic functions
+putStringAt :: Position -> String -> IO ()
+putStringAt position symbol = do
+  goto position
+  putStr symbol
+
+putSymbolsRow :: [Position] -> Int -> [Symbol] -> IO ()
+putSymbolsRow positions offset symbols = do
+  sequence_ [putStringAt position (toSymbol symbol) | (position, symbol) <- zip positions symbols]
+
+putSymbolsGrid :: Int -> Int -> Position -> SymbolsGrid -> IO ()
+putSymbolsGrid cellSize gridSize position gridSymbols = do
+  sequence_ [putSymbolsRow rowPositions cellSize rowSymbols | (rowPositions, rowSymbols) <- zip gridPositions gridSymbols]
   where
-    positions = getPlayerRow (x, y) offset players
+    gridPositions = symGridPositions cellSize position gridSize
 
-putPlayerGrid :: Int -> Position -> Grid -> IO ()
-putPlayerGrid cellSize position grid = do
-  sequence_ [putPlayerRow (head playerRows) cellSize row | (playerRows, row) <- zip playerGrid grid]
-  where
-    playerGrid = getPlayerGrid cellSize position grid
+putLine :: Int -> [Int] -> (Position -> IO ()) -> IO ()
+putLine coord offsets fn = do
+  sequence_ [fn (offsetCoord, coord) | offsetCoord <- offsets]
 
-putLine :: Int -> Int -> Int -> Int -> (Position -> IO ()) -> IO ()
-putLine cellSize gridSize y offset fn = do
-  sequence_ [fn (x, y) | x <- [offset .. offset + (cellSize * gridSize)]]
-
-putTicTacToeGrid :: Int -> Int -> Position -> Grid -> IO ()
-putTicTacToeGrid cellSize gridSize position grid = do
-  sequence_ [putLine cellSize gridSize (originX + dx * cellSize) originY hLine | dx <- gridLines]
-  sequence_ [putLine cellSize gridSize (originY + dy * cellSize) originX vLine | dy <- gridLines]
-  putPlayerGrid cellSize position grid
+putTicTacToeGrid :: Int -> Int -> Position -> SymbolsGrid -> IO ()
+putTicTacToeGrid cellSize gridSize position gridSymbols = do
+  sequence_ [putLine (originX + dx * cellSize) hOffsets hLine | dx <- gridLines]
+  sequence_ [putLine (originY + dy * cellSize) vOffsets vLine | dy <- gridLines]
+  putSymbolsGrid cellSize gridSize position gridSymbols
   goto (0, 0)
   where
     originX = fst position
     originY = snd position
+    hOffsets = [originY .. originY + (cellSize * gridSize)]
+    vOffsets = [originX .. originX + (cellSize * gridSize)]
     gridLines = [1 .. gridSize - 1]
     hLine (x, y) = putStringAt (y, x) "|"
     vLine (x, y) = putStringAt (x, y) "-"
@@ -115,32 +108,32 @@ origin = (30, 10)
 
 type Position = (Int, Int)
 
-data Player = O | B | X deriving (Eq, Ord, Show)
+data Symbol = O | B | X deriving (Eq, Ord, Show)
 
-type Grid = [[Player]]
+type SymbolsGrid = [[Symbol]]
 
-next :: Player -> Player
+next :: Symbol -> Symbol
 next O = X
 next B = B
 next X = O
 
-empty :: Grid
+empty :: SymbolsGrid
 empty = replicate gridSize (replicate gridSize B)
 
-isFull :: Grid -> Bool
+isFull :: SymbolsGrid -> Bool
 isFull = notElem B . concat
 
-turn :: Grid -> Player
+turn :: SymbolsGrid -> Symbol
 turn grid = if os <= xs then O else X
   where
     ps = concat grid
     os = length (filter (== O) ps)
     xs = length (filter (== X) ps)
 
-diag :: Grid -> [Player]
+diag :: SymbolsGrid -> [Symbol]
 diag grid = [grid !! n !! n | n <- [0 .. gridSize - 1]]
 
-winFor :: Player -> Grid -> Bool
+winFor :: Symbol -> SymbolsGrid -> Bool
 winFor p grid = any line (rows ++ cols ++ dias)
   where
     line = all (== p)
@@ -148,22 +141,22 @@ winFor p grid = any line (rows ++ cols ++ dias)
     cols = transpose grid
     dias = [diag grid, diag (map reverse grid)]
 
-won :: Grid -> Bool
+won :: SymbolsGrid -> Bool
 won grid = winFor O grid || winFor X grid
 
-toSymbol :: Player -> String
+toSymbol :: Symbol -> String
 toSymbol O = "⭕"
 toSymbol X = "❌"
 toSymbol B = "  "
 
-putGrid :: Grid -> IO ()
+putGrid :: SymbolsGrid -> IO ()
 putGrid = putTicTacToeGrid cellSize gridSize origin
 
-validMove :: Grid -> Int -> Bool
+validMove :: SymbolsGrid -> Int -> Bool
 validMove grid index = index >= 0 && index < gridSize ^ 2 && concat grid !! index == B
 
-move :: Grid -> Int -> Player -> [Grid]
-move grid index player = [chop gridSize (xs ++ [player] ++ ys) | validMove grid index]
+move :: SymbolsGrid -> Int -> Symbol -> [SymbolsGrid]
+move grid index symbol = [chop gridSize (xs ++ [symbol] ++ ys) | validMove grid index]
   where
     (xs, B : ys) = splitAt index (concat grid)
 
@@ -183,7 +176,7 @@ getNat = do
 tictactoe :: IO ()
 tictactoe = run empty O
 
-run :: Grid -> Player -> IO ()
+run :: SymbolsGrid -> Symbol -> IO ()
 run g p = do
   -- Reset screen
   clearScn
@@ -191,7 +184,7 @@ run g p = do
   putGrid g
   run' g p
 
-run' :: Grid -> Player -> IO ()
+run' :: SymbolsGrid -> Symbol -> IO ()
 run' g p
   | winFor O g = printMsg "Player O wins!\n"
   | winFor X g = printMsg "Player X wins!\n"
