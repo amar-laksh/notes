@@ -7,6 +7,8 @@ module TicTacToe
     winFor,
     moveGrid,
     putTicTacToeGrid,
+    positionsForRow,
+    positionsForGrid,
   )
 where
 
@@ -19,19 +21,19 @@ import Graphics (clearScn, goto)
 -- Graphics section
 
 -- Pure functions; we can test these exhaustively!
-symGridRow :: Position -> Int -> Int -> [Position]
-symGridRow (x, y) gridOffset numOfSymbols = do
-  [(x + (gridOffset * row), y) | row <- [0 .. numOfSymbols - 1]]
+positionsForRow :: Position -> Int -> Int -> [Position]
+positionsForRow (x, y) rowOffset rowLength = do
+  [(x + (rowOffset * row), y) | row <- [0 .. rowLength - 1]]
 
-symGridPositions :: Int -> Position -> Int -> [[Position]]
-symGridPositions cellSize position numOfSymbols = do
-  [symGridRow (originX, originY + (cellSize * column)) cellSize numOfSymbols | column <- columns]
+positionsForGrid :: Position -> Int -> Int -> [[Position]]
+positionsForGrid origin gridSize cellSize = do
+  [positionsForRow (originX, originY + (cellSize * column)) cellSize gridSize | column <- columns]
   where
     -- We put the symbols in the middle of the cell
     symbolOffset = cellSize `div` 2
-    originX = fst position + symbolOffset
-    originY = snd position + symbolOffset
-    columns = [0 .. numOfSymbols - 1]
+    originX = fst origin + symbolOffset
+    originY = snd origin + symbolOffset
+    columns = [0 .. gridSize - 1]
 
 -- Monadic functions
 putStringAt :: Position -> String -> IO ()
@@ -39,15 +41,15 @@ putStringAt position symbol = do
   goto position
   putStr symbol
 
-putSymbolsRow :: [Position] -> Int -> [Symbol] -> IO ()
-putSymbolsRow positions offset symbols = do
+putSymbolsRow :: [Position] -> [Symbol] -> IO ()
+putSymbolsRow positions symbols = do
   sequence_ [putStringAt position (toSymbol symbol) | (position, symbol) <- zip positions symbols]
 
-putSymbolsGrid :: Int -> Int -> Position -> SymbolsGrid -> IO ()
-putSymbolsGrid cellSize gridSize position gridSymbols = do
-  sequence_ [putSymbolsRow rowPositions cellSize rowSymbols | (rowPositions, rowSymbols) <- zip gridPositions gridSymbols]
+putSymbolsGrid :: Position -> SymbolsGrid -> Int -> Int -> IO ()
+putSymbolsGrid origin gridSymbols gridSize cellSize = do
+  sequence_ [putSymbolsRow rowPositions rowSymbols | (rowPositions, rowSymbols) <- zip gridPositions gridSymbols]
   where
-    gridPositions = symGridPositions cellSize position gridSize
+    gridPositions = positionsForGrid origin gridSize cellSize
 
 putLine :: Int -> [Int] -> (Position -> IO ()) -> IO ()
 putLine coord offsets fn = do
@@ -55,26 +57,25 @@ putLine coord offsets fn = do
 
 putTicTacToeGrid :: Int -> Int -> Position -> SymbolsGrid -> IO ()
 putTicTacToeGrid cellSize gridSize position gridSymbols = do
-  sequence_ [putLine (originX + dx * cellSize) hOffsets hLine | dx <- gridLines]
-  sequence_ [putLine (originY + dy * cellSize) vOffsets vLine | dy <- gridLines]
-  putSymbolsGrid cellSize gridSize position gridSymbols
-  goto (0, 0)
+  sequence_ [putLine (originX + dx * cellSize) hOffsets putHLine | dx <- gridLines]
+  sequence_ [putLine (originY + dy * cellSize) vOffsets putVLine | dy <- gridLines]
+  putSymbolsGrid position gridSymbols gridSize cellSize
   where
     originX = fst position
     originY = snd position
     hOffsets = [originY .. originY + (cellSize * gridSize)]
     vOffsets = [originX .. originX + (cellSize * gridSize)]
     gridLines = [1 .. gridSize - 1]
-    hLine (x, y) = putStringAt (y, x) "|"
-    vLine (x, y) = putStringAt (x, y) "-"
+    putHLine (x, y) = putStringAt (y, x) "|"
+    putVLine (x, y) = putStringAt (x, y) "-"
 
 -- TODO : Fix this to be correct
 moveGrid' :: Position -> IO ()
 moveGrid' (x, y) = do
-  goto (0, 0)
   threadDelay 20000
   clearScn
   putTicTacToeGrid 5 3 (x, y) [[O, O, X], [X, X, O], [X, B, X]]
+  goto (0, 0)
 
 moveGrid :: Position -> Position -> IO ()
 moveGrid origin dest = do
