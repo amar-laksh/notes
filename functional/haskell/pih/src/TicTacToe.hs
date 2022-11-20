@@ -1,3 +1,8 @@
+-- TODO:
+-- Get blank symbol positions
+-- use those positions to move around to the nearest blank for a specific direction in the grid
+-- the above can be invoked using arrow/hjkl keys or any other keypress
+
 module TicTacToe
   ( Symbol (..),
     toSymbol,
@@ -9,13 +14,14 @@ module TicTacToe
     putTicTacToeGrid,
     positionsForRow,
     positionsForGrid,
+    positionsOf,
   )
 where
 
-import Chapter10 (getChar', readLine')
+import Chapter10 (readLine')
+import Chapter5 (positions')
 import Control.Concurrent
-import Data.Char (digitToInt)
-import Data.List
+import Data.List (transpose)
 import Graphics (clearScn, goto)
 
 -- Graphics section
@@ -56,13 +62,13 @@ putLine coord offsets fn = do
   sequence_ [fn (offsetCoord, coord) | offsetCoord <- offsets]
 
 putTicTacToeGrid :: Int -> Int -> Position -> SymbolsGrid -> IO ()
-putTicTacToeGrid cellSize gridSize position gridSymbols = do
+putTicTacToeGrid cellSize gridSize origin gridSymbols = do
   sequence_ [putLine (originX + dx * cellSize) hOffsets putHLine | dx <- gridLines]
   sequence_ [putLine (originY + dy * cellSize) vOffsets putVLine | dy <- gridLines]
-  putSymbolsGrid position gridSymbols gridSize cellSize
+  putSymbolsGrid origin gridSymbols gridSize cellSize
   where
-    originX = fst position
-    originY = snd position
+    originX = fst origin
+    originY = snd origin
     hOffsets = [originY .. originY + (cellSize * gridSize)]
     vOffsets = [originX .. originX + (cellSize * gridSize)]
     gridLines = [1 .. gridSize - 1]
@@ -113,6 +119,22 @@ data Symbol = O | B | X deriving (Eq, Ord, Show)
 
 type SymbolsGrid = [[Symbol]]
 
+type PositionsGrid = [[Position]]
+
+type SymbolsMap = [[(Symbol, Position)]]
+
+positionsOf :: Symbol -> SymbolsMap -> PositionsGrid
+positionsOf symbol symbolMap = do
+  [map snd (filter (\(sym, position) -> sym == symbol) element) | element <- symbolMap]
+
+symbolsOf :: Position -> SymbolsMap -> SymbolsGrid
+symbolsOf position symbolMap = do
+  [map fst (filter (\(symbol, pos) -> pos == position) element) | element <- symbolMap]
+
+-- getBlankGrid :: SymbolsGrid -> SymbolsMap
+-- getBlankGrid grid = do
+--   positionsOf B grid
+--
 next :: Symbol -> Symbol
 next O = X
 next B = B
@@ -162,9 +184,17 @@ move grid index symbol = [chop gridSize (xs ++ [symbol] ++ ys) | validMove grid 
     (xs, B : ys) = splitAt index (concat grid)
 
 chop :: Int -> [a] -> [[a]]
-chop n [] = []
+chop _ [] = []
 chop n xs = take n xs : chop n (drop n xs)
 
+-- getNearestBlank:: Position -> [Position]
+-- getNearestBlank position positions =
+--
+-- TODO make this
+-- getTurn :: [Position] -> [SymbolsGrid] -> Int
+-- getTurn positions grid = do
+--   return a
+--
 processInput :: IO Int
 processInput = do
   input <- readLine'
