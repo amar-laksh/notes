@@ -21,6 +21,7 @@ where
 import Chapter10 (readLine')
 import Chapter5 (positions')
 import Control.Concurrent
+import Data.Char (isDigit)
 import Data.List (transpose)
 import Graphics (clearScn, goto)
 
@@ -113,9 +114,11 @@ cellSize = 6
 
 origin = (30, 10)
 
-type Position = (Int, Int)
-
 data Symbol = O | B | X deriving (Eq, Ord, Show)
+
+data GameTree t = Node t [GameTree t] deriving (Show)
+
+type Position = (Int, Int)
 
 type SymbolsGrid = [[Symbol]]
 
@@ -143,8 +146,8 @@ next X = O
 empty :: SymbolsGrid
 empty = replicate gridSize (replicate gridSize B)
 
-isFull :: SymbolsGrid -> Bool
-isFull = notElem B . concat
+full :: SymbolsGrid -> Bool
+full = notElem B . concat
 
 turn :: SymbolsGrid -> Symbol
 turn grid = if os <= xs then O else X
@@ -195,17 +198,33 @@ chop n xs = take n xs : chop n (drop n xs)
 -- getTurn positions grid = do
 --   return a
 --
+
+moves :: SymbolsGrid -> Symbol -> [SymbolsGrid]
+moves g p
+  | won g = []
+  | full g = []
+  | otherwise = concat [move g i p | i <- [0 .. ((gridSize ^ 2) - 1)]]
+
+gametree :: SymbolsGrid -> Symbol -> GameTree SymbolsGrid
+gametree g p = Node g [gametree g' (next p) | g' <- moves g p]
+
 processInput :: IO Int
 processInput = do
   input <- readLine'
   return 0
 
-getNat :: IO Int
-getNat = do
-  processInput
+prompt :: Symbol -> String
+prompt p = "Player " ++ show p ++ ", enter your move: "
 
-tictactoe :: IO ()
-tictactoe = run empty O
+getNat :: String -> IO Int
+getNat prompt = do
+  printMsg prompt
+  xs <- getLine
+  if xs /= [] && all isDigit xs
+    then return (read xs)
+    else do
+      putStrLn "ERROR: Invalid number"
+      getNat prompt
 
 run :: SymbolsGrid -> Symbol -> IO ()
 run g p = do
@@ -219,10 +238,10 @@ run' :: SymbolsGrid -> Symbol -> IO ()
 run' g p
   | winFor O g = printMsg "Player O wins!\n"
   | winFor X g = printMsg "Player X wins!\n"
-  | isFull g = printMsg "It's a draw!\n"
+  | full g = printMsg "It's a draw!\n"
   | otherwise = do
       -- TODO:  make a getNat that works with arrows and returns the index
-      turn <- getNat
+      turn <- getNat (prompt p)
       case move g turn p of
         [] -> do
           -- printMsg pos "ERROR: Invalid move"
@@ -232,5 +251,8 @@ run' g p
 
 printMsg :: String -> IO ()
 printMsg msg = do
-  goto (gridSize * gridSize * 10, 1)
+  goto (0, 1)
   putStrLn msg
+
+tictactoe :: IO ()
+tictactoe = run empty O
