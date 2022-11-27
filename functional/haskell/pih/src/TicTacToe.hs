@@ -9,7 +9,6 @@ module TicTacToe
     putGrid,
     getNat,
     tictactoe,
-    winFor,
     moveGrid,
     putTicTacToeGrid,
     positionsForRow,
@@ -114,6 +113,8 @@ cellSize = 6
 
 origin = (30, 10)
 
+treeDepth = 9
+
 data Symbol = O | B | X deriving (Eq, Ord, Show)
 
 data GameTree t = Node t [GameTree t] deriving (Show)
@@ -125,6 +126,42 @@ type SymbolsGrid = [[Symbol]]
 type PositionsGrid = [[Position]]
 
 type SymbolsMap = [[(Symbol, Position)]]
+
+-- Computer Part Starts --------------
+
+gametree :: SymbolsGrid -> Symbol -> GameTree SymbolsGrid
+gametree grid symbol = Node grid [gametree node (next symbol) | node <- moves grid symbol]
+
+moves :: SymbolsGrid -> Symbol -> [SymbolsGrid]
+moves grid symbol
+  | won grid = []
+  | full grid = []
+  | otherwise = concat [move grid index symbol | index <- [0 .. ((gridSize ^ 2) - 1)]]
+
+prune :: Int -> GameTree t -> GameTree t
+prune 0 (Node x _) = Node x []
+prune n (Node x ts) = Node x [prune (n - 1) t | t <- ts]
+
+minimax :: GameTree SymbolsGrid -> GameTree (SymbolsGrid, Symbol)
+minimax (Node g [])
+  | wins O g = Node (g, O) []
+  | wins X g = Node (g, X) []
+  | otherwise = Node (g, B) []
+minimax (Node g trees)
+  | turn g == O = Node (g, minimum ps) ts'
+  | turn g == X = Node (g, minimum ps) ts'
+  | otherwise = Node (g, minimum ps) ts'
+  where
+    ts' = map minimax trees
+    ps = [p | Node (_, p) _ <- ts']
+
+bestmove :: SymbolsGrid -> Symbol -> SymbolsGrid
+bestmove grid symbol = head [node | Node (node, symbol') _ <- trees, symbol' == best]
+  where
+    tree = prune treeDepth (gametree grid symbol)
+    Node (_, best) trees = minimax tree
+
+-- Computer Part Ends --------------
 
 positionsOf :: Symbol -> SymbolsMap -> PositionsGrid
 positionsOf symbol symbolMap = do
@@ -159,8 +196,8 @@ turn grid = if os <= xs then O else X
 diag :: SymbolsGrid -> [Symbol]
 diag grid = [grid !! n !! n | n <- [0 .. gridSize - 1]]
 
-winFor :: Symbol -> SymbolsGrid -> Bool
-winFor p grid = any line (rows ++ cols ++ dias)
+wins :: Symbol -> SymbolsGrid -> Bool
+wins p grid = any line (rows ++ cols ++ dias)
   where
     line = all (== p)
     rows = grid
@@ -168,7 +205,7 @@ winFor p grid = any line (rows ++ cols ++ dias)
     dias = [diag grid, diag (map reverse grid)]
 
 won :: SymbolsGrid -> Bool
-won grid = winFor O grid || winFor X grid
+won grid = wins O grid || wins X grid
 
 toSymbol :: Symbol -> String
 toSymbol O = "⭕"
@@ -199,15 +236,6 @@ chop n xs = take n xs : chop n (drop n xs)
 --   return a
 --
 
-moves :: SymbolsGrid -> Symbol -> [SymbolsGrid]
-moves g p
-  | won g = []
-  | full g = []
-  | otherwise = concat [move g i p | i <- [0 .. ((gridSize ^ 2) - 1)]]
-
-gametree :: SymbolsGrid -> Symbol -> GameTree SymbolsGrid
-gametree g p = Node g [gametree g' (next p) | g' <- moves g p]
-
 processInput :: IO Int
 processInput = do
   input <- readLine'
@@ -236,8 +264,8 @@ run g p = do
 
 run' :: SymbolsGrid -> Symbol -> IO ()
 run' g p
-  | winFor O g = printMsg "Player O wins!\n"
-  | winFor X g = printMsg "Player X wins!\n"
+  | wins O g = printMsg "Player O wins!\n"
+  | wins X g = printMsg "Player X wins!\n"
   | full g = printMsg "It's a draw!\n"
   | otherwise = do
       -- TODO:  make a getNat that works with arrows and returns the index
