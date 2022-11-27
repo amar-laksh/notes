@@ -5,7 +5,7 @@
 
 module TicTacToe
   ( Symbol (..),
-    toSymbol,
+    fromSymbol,
     putGrid,
     getNat,
     tictactoe,
@@ -14,6 +14,8 @@ module TicTacToe
     positionsForRow,
     positionsForGrid,
     positionsOf,
+    bestmove,
+    goto,
   )
 where
 
@@ -22,6 +24,7 @@ import Chapter5 (positions')
 import Control.Concurrent
 import Data.Char (isDigit)
 import Data.List (transpose)
+import Data.Maybe (fromMaybe, listToMaybe)
 import Graphics (clearScn, goto)
 
 -- Graphics section
@@ -49,7 +52,7 @@ putStringAt position symbol = do
 
 putSymbolsRow :: [Position] -> [Symbol] -> IO ()
 putSymbolsRow positions symbols = do
-  sequence_ [putStringAt position (toSymbol symbol) | (position, symbol) <- zip positions symbols]
+  sequence_ [putStringAt position (fromSymbol symbol) | (position, symbol) <- zip positions symbols]
 
 putSymbolsGrid :: Position -> SymbolsGrid -> Int -> Int -> IO ()
 putSymbolsGrid origin gridSymbols gridSize cellSize = do
@@ -66,6 +69,7 @@ putTicTacToeGrid cellSize gridSize origin gridSymbols = do
   sequence_ [putLine (originX + dx * cellSize) hOffsets putHLine | dx <- gridLines]
   sequence_ [putLine (originY + dy * cellSize) vOffsets putVLine | dy <- gridLines]
   putSymbolsGrid origin gridSymbols gridSize cellSize
+  goto (0, 0)
   where
     originX = fst origin
     originY = snd origin
@@ -143,21 +147,24 @@ prune 0 (Node x _) = Node x []
 prune n (Node x ts) = Node x [prune (n - 1) t | t <- ts]
 
 minimax :: GameTree SymbolsGrid -> GameTree (SymbolsGrid, Symbol)
-minimax (Node g [])
-  | wins O g = Node (g, O) []
-  | wins X g = Node (g, X) []
-  | otherwise = Node (g, B) []
-minimax (Node g trees)
-  | turn g == O = Node (g, minimum ps) ts'
-  | turn g == X = Node (g, minimum ps) ts'
-  | otherwise = Node (g, minimum ps) ts'
+minimax (Node grid [])
+  | wins O grid = Node (grid, O) []
+  | wins X grid = Node (grid, X) []
+  | otherwise = Node (grid, B) []
+minimax (Node grid subTrees)
+  | turn grid == O = Node (grid, minimum subTreeSymbols) subtree
+  | turn grid == X = Node (grid, maximum subTreeSymbols) subtree
   where
-    ts' = map minimax trees
-    ps = [p | Node (_, p) _ <- ts']
+    -- \| otherwise = Node ([], B) [] -- We really don't care about this branch but it's there for the sake of pattern exhaustion
+
+    subtree = map minimax subTrees
+    subTreeSymbols = [symbol | Node (_, symbol) _ <- subtree]
 
 bestmove :: SymbolsGrid -> Symbol -> SymbolsGrid
-bestmove grid symbol = head [node | Node (node, symbol') _ <- trees, symbol' == best]
+bestmove grid symbol = bestMoves
   where
+    defaultChoiceGrid = [if s == B then [symbol] else [s] | row <- grid, s <- row]
+    bestMoves = head [node | Node (node, symbol') _ <- trees, symbol' == best]
     tree = prune treeDepth (gametree grid symbol)
     Node (_, best) trees = minimax tree
 
@@ -207,10 +214,10 @@ wins p grid = any line (rows ++ cols ++ dias)
 won :: SymbolsGrid -> Bool
 won grid = wins O grid || wins X grid
 
-toSymbol :: Symbol -> String
-toSymbol O = "⭕"
-toSymbol X = "❌"
-toSymbol B = "  "
+fromSymbol :: Symbol -> String
+fromSymbol O = "⭕"
+fromSymbol X = "❌"
+fromSymbol B = "  "
 
 putGrid :: SymbolsGrid -> IO ()
 putGrid = putTicTacToeGrid cellSize gridSize origin
