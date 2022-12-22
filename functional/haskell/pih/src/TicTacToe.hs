@@ -5,6 +5,10 @@
 
 module TicTacToe
   ( Symbol (..),
+    GameTree (..),
+    Strategy (..),
+    SymbolsGrid (..),
+    Players (..),
     fromSymbol,
     putGrid,
     getNat,
@@ -15,7 +19,13 @@ module TicTacToe
     positionsForGrid,
     positionsOf,
     bestmove,
+    prune,
     goto,
+    gametree,
+    treeDepth,
+    minimax,
+    isEmpty,
+    wins,
   )
 where
 
@@ -121,7 +131,9 @@ treeDepth = 9
 
 data Symbol = O | B | X deriving (Eq, Ord, Show)
 
-data GameTree t = Node t [GameTree t] deriving (Show)
+data Players = Human | Computer deriving (Eq, Ord, Show)
+
+data GameTree t = Node t [GameTree t] deriving (Show, Eq, Ord)
 
 type Position = (Int, Int)
 
@@ -130,6 +142,10 @@ type SymbolsGrid = [[Symbol]]
 type PositionsGrid = [[Position]]
 
 type SymbolsMap = [[(Symbol, Position)]]
+
+type Strategy = (SymbolsGrid -> Symbol -> SymbolsGrid)
+
+type WinCondition = Symbol -> SymbolsGrid -> Bool
 
 -- Computer Part Starts --------------
 
@@ -154,13 +170,12 @@ minimax (Node grid [])
 minimax (Node grid subTrees)
   | turn grid == O = Node (grid, minimum subTreeSymbols) subtree
   | turn grid == X = Node (grid, maximum subTreeSymbols) subtree
+  | otherwise = Node ([], B) [] -- We really don't care about this branch but it's there for the sake of pattern exhaustion
   where
-    -- \| otherwise = Node ([], B) [] -- We really don't care about this branch but it's there for the sake of pattern exhaustion
-
     subtree = map minimax subTrees
     subTreeSymbols = [symbol | Node (_, symbol) _ <- subtree]
 
-bestmove :: SymbolsGrid -> Symbol -> SymbolsGrid
+bestmove :: Strategy
 bestmove grid symbol = bestMoves
   where
     defaultChoiceGrid = [if s == B then [symbol] else [s] | row <- grid, s <- row]
@@ -187,11 +202,18 @@ next O = X
 next B = B
 next X = O
 
+nextPlayer :: Players -> Players
+nextPlayer Human = Computer
+nextPlayer Computer = Human
+
 empty :: SymbolsGrid
 empty = replicate gridSize (replicate gridSize B)
 
 full :: SymbolsGrid -> Bool
 full = notElem B . concat
+
+isEmpty :: SymbolsGrid -> Bool
+isEmpty = elem B . concat
 
 turn :: SymbolsGrid -> Symbol
 turn grid = if os <= xs then O else X
@@ -203,7 +225,7 @@ turn grid = if os <= xs then O else X
 diag :: SymbolsGrid -> [Symbol]
 diag grid = [grid !! n !! n | n <- [0 .. gridSize - 1]]
 
-wins :: Symbol -> SymbolsGrid -> Bool
+wins :: WinCondition
 wins p grid = any line (rows ++ cols ++ dias)
   where
     line = all (== p)
@@ -219,6 +241,11 @@ fromSymbol O = "⭕"
 fromSymbol X = "❌"
 fromSymbol B = "  "
 
+playerInOrder :: (Players, Players) -> Symbol
+playerInOrder order
+  | fst order == Human = O
+  | otherwise = X
+
 putGrid :: SymbolsGrid -> IO ()
 putGrid = putTicTacToeGrid cellSize gridSize origin
 
@@ -233,15 +260,6 @@ move grid index symbol = [chop gridSize (xs ++ [symbol] ++ ys) | validMove grid 
 chop :: Int -> [a] -> [[a]]
 chop _ [] = []
 chop n xs = take n xs : chop n (drop n xs)
-
--- getNearestBlank:: Position -> [Position]
--- getNearestBlank position positions =
---
--- TODO make this
--- getTurn :: [Position] -> [SymbolsGrid] -> Int
--- getTurn positions grid = do
---   return a
---
 
 processInput :: IO Int
 processInput = do
@@ -261,33 +279,34 @@ getNat prompt = do
       putStrLn "ERROR: Invalid number"
       getNat prompt
 
-run :: SymbolsGrid -> Symbol -> IO ()
-run g p = do
+run :: Strategy -> SymbolsGrid -> Symbol -> Players -> WinCondition -> IO ()
+run strategy g p player condition = do
   -- Reset screen
   clearScn
   goto (0, 0)
   putGrid g
-  run' g p
+  run' strategy g p player condition
 
-run' :: SymbolsGrid -> Symbol -> IO ()
-run' g p
-  | wins O g = printMsg "Player O wins!\n"
-  | wins X g = printMsg "Player X wins!\n"
+run' :: Strategy -> SymbolsGrid -> Symbol -> Players -> WinCondition -> IO ()
+run' strategy g p player condition
+  | condition O g = printMsg "Player O wins!\n"
+  | condition X g = printMsg "Player X wins!\n"
   | full g = printMsg "It's a draw!\n"
-  | otherwise = do
-      -- TODO:  make a getNat that works with arrows and returns the index
+  | player == Human = do
       turn <- getNat (prompt p)
       case move g turn p of
         [] -> do
-          -- printMsg pos "ERROR: Invalid move"
-          run' g p
+          run' strategy g p (nextPlayer player) condition
         g' -> do
-          run (head g') (next p)
+          run strategy (head g') (next p) (nextPlayer player) condition
+  | player == Computer = do
+      putStrLn ("Player " ++ show p ++ " is thinking...")
+      (run strategy $! strategy g p) (next p) (nextPlayer player) condition
 
 printMsg :: String -> IO ()
 printMsg msg = do
   goto (0, 1)
   putStrLn msg
 
-tictactoe :: IO ()
-tictactoe = run empty O
+tictactoe :: Strategy -> Symbol -> Players -> WinCondition -> IO ()
+tictactoe strategy = run strategy empty

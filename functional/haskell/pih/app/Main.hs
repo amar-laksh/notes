@@ -7,6 +7,7 @@ import qualified Chapter1 as C1
 {-import qualified Nim as N-}
 
 import qualified Chapter10 as C10
+import qualified Chapter11 as C11
 import qualified Chapter2 as C2
 import qualified Chapter4 as C4
 import qualified Chapter5 as C5
@@ -97,8 +98,9 @@ main = do
   print (TC.isTaut' (TC.Imply (TC.And (TC.Var 'A') (TC.Var 'B')) (TC.Var 'A')))
   let expr' = AM.Add (AM.Mult (AM.Val 2) (AM.Val 4)) (AM.Val 5)
   print (AM.value' expr')
-  --print (C9.countdowndownApproxSortedSolutions' [2, 3, 4, 5] 100)
+  -- print (C9.countdowndownApproxSortedSolutions' [2, 3, 4, 5] 100)
 
   C10.putStr' "hello world"
+  C11.answers
 
---N.play [2, 0] 1
+-- N.play [2, 0] 1
