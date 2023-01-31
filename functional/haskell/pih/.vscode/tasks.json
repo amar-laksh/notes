@@ -1,0 +1,9 @@
+{
+    "tasks": [
+        {
+            "label": "run application",
+            "type": "shell",
+            "command": "stack build --fast && stack run"
+        }
+    ]
+}
