@@ -4,6 +4,11 @@
             "label": "run application",
             "type": "shell",
             "command": "stack build --fast && stack run"
+        },
+        {
+            "label": "run tests",
+            "type": "shell",
+            "command": "stack test --fast"
         }
     ]
 }
