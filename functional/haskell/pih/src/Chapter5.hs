@@ -1,5 +1,5 @@
-module Chapter5
-  ( sumOfSquares,
+module Chapter5 (
+    sumOfSquares,
     grid,
     square,
     replicate',
@@ -9,7 +9,7 @@ module Chapter5
     positions',
     positionsUsingFind,
     scalarProduct,
-  )
+)
 where
 
 sumOfSquares :: (Num n, Enum n) => n -> n
@@ -26,12 +26,12 @@ replicate' times el = [el | _ <- [1 .. times]]
 
 pyths :: Int -> Int -> [(Int, Int, Int)]
 pyths limit power =
-  [ (x, y, z)
-    | x <- [1 .. limit],
-      y <- [1 .. limit],
-      z <- [1 .. limit],
-      x ^ power + y ^ power == z ^ power
-  ]
+    [ (x, y, z)
+    | x <- [1 .. limit]
+    , y <- [1 .. limit]
+    , z <- [1 .. limit]
+    , x ^ power + y ^ power == z ^ power
+    ]
 
 factors' :: Int -> [Int]
 factors' limit = [n | n <- [1 .. limit], limit `mod` n == 0]

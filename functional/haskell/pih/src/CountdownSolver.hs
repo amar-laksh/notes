@@ -1,5 +1,5 @@
-module CountdownSolver
-  ( perms',
+module CountdownSolver (
+    perms',
     interleave',
     evalPercent',
     solutions',
@@ -11,29 +11,29 @@ module CountdownSolver
     eval',
     values',
     exprs',
-  )
+)
 where
 
 data Op = Add | Sub | Mul | Div | Exp deriving (Eq, Ord)
 
 instance Show Op where
-  show Add = "+"
-  show Sub = "-"
-  show Mul = "*"
-  show Div = "/"
-  show Exp = "^"
+    show Add = "+"
+    show Sub = "-"
+    show Mul = "*"
+    show Div = "/"
+    show Exp = "^"
 
 data Expr
-  = Val Int
-  | App Op Expr Expr
-  deriving (Eq, Ord)
+    = Val Int
+    | App Op Expr Expr
+    deriving (Eq, Ord)
 
 instance Show Expr where
-  show (Val n) = show n
-  show (App op l r) = bracket l ++ show op ++ bracket r
-    where
-      bracket (Val v) = show v
-      bracket expr = "(" ++ show expr ++ ")"
+    show (Val n) = show n
+    show (App op l r) = bracket l ++ show op ++ bracket r
+      where
+        bracket (Val v) = show v
+        bracket expr = "(" ++ show expr ++ ")"
 
 valid :: Op -> Int -> Int -> Bool
 valid Add x y = x < y
@@ -95,23 +95,23 @@ exprs' ns = [e | (ls, rs) <- split' ns, l <- exprs' ls, r <- exprs' rs, e <- com
 
 solutions' :: [Int] -> Int -> [Expr]
 solutions' ns target =
-  [exp | ns' <- choices' ns, exp <- exprs' ns', eval' exp == [target]]
+    [exp | ns' <- choices' ns, exp <- exprs' ns', eval' exp == [target]]
 
 smallerSolutions' :: [Int] -> Int -> [Expr]
 smallerSolutions' ns target =
-  [exp | ns' <- choices' ns, exp <- exprs' ns', eval' exp < [target]]
+    [exp | ns' <- choices' ns, exp <- exprs' ns', eval' exp < [target]]
 
 maximum' :: Ord a => [a] -> a
 maximum' = foldr1 (\x y -> if x >= y then x else y)
 
 nearestSolutions' :: [Int] -> Int -> [Expr]
 nearestSolutions' ns target =
-  solutions' ns (maximum' [v | exp <- smallerSolutions' ns target, v <- eval' exp])
+    solutions' ns (maximum' [v | exp <- smallerSolutions' ns target, v <- eval' exp])
 
 approxSolutions' :: [Int] -> Int -> [Expr]
 approxSolutions' ns target
-  | null sols = nearestSolutions' ns target
-  | otherwise = sols
+    | null sols = nearestSolutions' ns target
+    | otherwise = sols
   where
     sols = solutions' ns target
 
@@ -124,8 +124,8 @@ evalPercent' ns target = (fromIntegral validExprs / fromIntegral possibleExprs *
 removeFirstOccurence' :: Eq a => a -> [a] -> [a]
 removeFirstOccurence' _ [] = []
 removeFirstOccurence' val (x : xs)
-  | val == x = xs
-  | otherwise = x : removeFirstOccurence' val xs
+    | val == x = xs
+    | otherwise = x : removeFirstOccurence' val xs
 
 isChoice' :: (Eq a, Num a, Enum a) => [a] -> [a] -> Bool
 isChoice' [] _ = True

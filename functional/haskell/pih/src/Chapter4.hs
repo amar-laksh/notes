@@ -1,5 +1,5 @@
-module Chapter4
-  ( halve',
+module Chapter4 (
+    halve',
     halveErrorMsg,
     thirdUsingHeadTail,
     thirdUsingListIndexing,
@@ -9,7 +9,7 @@ module Chapter4
     safeTailUsingPatternMatching,
     luhnDouble,
     luhn,
-  )
+)
 where
 
 halveErrorMsg = "halve' doesn't take odd-sized list"
@@ -17,8 +17,8 @@ halveErrorMsg = "halve' doesn't take odd-sized list"
 halve' :: [el] -> ([el], [el])
 halve' [] = ([], [])
 halve' list
-  | even (length list) = splitAt (length list `div` 2) list
-  | otherwise = error halveErrorMsg
+    | even (length list) = splitAt (length list `div` 2) list
+    | otherwise = error halveErrorMsg
 
 thirdUsingHeadTail :: [el] -> el
 thirdUsingHeadTail list = head (tail (tail list))
@@ -38,8 +38,8 @@ null' _ = False
 
 safeTailUsingGuardedEquations :: [el] -> [el]
 safeTailUsingGuardedEquations list
-  | null' list = []
-  | otherwise = tail list
+    | null' list = []
+    | otherwise = tail list
 
 safeTailUsingConditionalExpr :: [el] -> [el]
 safeTailUsingConditionalExpr list = if null' list then [] else tail list
@@ -50,8 +50,8 @@ safeTailUsingPatternMatching (_ : xs) = xs
 
 luhnDouble :: Int -> Int
 luhnDouble n
-  | n * 2 > 9 = n * 2 - 9
-  | otherwise = n * 2
+    | n * 2 > 9 = n * 2 - 9
+    | otherwise = n * 2
 
 luhn :: Int -> Int -> Int -> Int -> Bool
 luhn first second trd frt = sum [luhnDouble first, second, luhnDouble trd, frt] `mod` 10 == 0

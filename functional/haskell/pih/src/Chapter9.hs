@@ -1,9 +1,9 @@
-module Chapter9
-  ( countdownSolutions',
+module Chapter9 (
+    countdownSolutions',
     countdownNearestSolutions',
     countdownApproxSolutions',
     countdowndownApproxSortedSolutions',
-  )
+)
 where
 
 import qualified CountdownSolver as CS
@@ -20,5 +20,5 @@ countdownApproxSolutions' = CS.approxSolutions'
 
 countdowndownApproxSortedSolutions' :: [Int] -> Int -> [CS.Expr]
 countdowndownApproxSortedSolutions' ns target = do
-  let sortedByLength = sort [(length (CS.values' e), e) | e <- countdownApproxSolutions' ns target]
-  map snd sortedByLength
+    let sortedByLength = sort [(length (CS.values' e), e) | e <- countdownApproxSolutions' ns target]
+    map snd sortedByLength

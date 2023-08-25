@@ -1,8 +1,8 @@
-module Chapter1
-  ( product',
+module Chapter1 (
+    product',
     qsort',
     qsortRev,
-  )
+)
 where
 
 product' :: Num el => [el] -> el

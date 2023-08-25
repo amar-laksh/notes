@@ -3,8 +3,8 @@
 -- use those positions to move around to the nearest blank for a specific direction in the grid
 -- the above can be invoked using arrow/hjkl keys or any other keypress
 
-module TicTacToe
-  ( Symbol (..),
+module TicTacToe (
+    Symbol (..),
     GameTree (..),
     Strategy (..),
     SymbolsGrid (..),
@@ -26,7 +26,7 @@ module TicTacToe
     minimax,
     isEmpty,
     wins,
-  )
+)
 where
 
 import Chapter10 (readLine')
@@ -42,11 +42,11 @@ import Graphics (clearScn, goto)
 -- Pure functions; we can test these exhaustively!
 positionsForRow :: Position -> Int -> Int -> [Position]
 positionsForRow (x, y) rowOffset rowLength = do
-  [(x + (rowOffset * row), y) | row <- [0 .. rowLength - 1]]
+    [(x + (rowOffset * row), y) | row <- [0 .. rowLength - 1]]
 
 positionsForGrid :: Position -> Int -> Int -> [[Position]]
 positionsForGrid origin gridSize cellSize = do
-  [positionsForRow (originX, originY + (cellSize * column)) cellSize gridSize | column <- columns]
+    [positionsForRow (originX, originY + (cellSize * column)) cellSize gridSize | column <- columns]
   where
     -- We put the symbols in the middle of the cell
     symbolOffset = cellSize `div` 2
@@ -57,29 +57,29 @@ positionsForGrid origin gridSize cellSize = do
 -- Monadic functions
 putStringAt :: Position -> String -> IO ()
 putStringAt position symbol = do
-  goto position
-  putStr symbol
+    goto position
+    putStr symbol
 
 putSymbolsRow :: [Position] -> [Symbol] -> IO ()
 putSymbolsRow positions symbols = do
-  sequence_ [putStringAt position (fromSymbol symbol) | (position, symbol) <- zip positions symbols]
+    sequence_ [putStringAt position (fromSymbol symbol) | (position, symbol) <- zip positions symbols]
 
 putSymbolsGrid :: Position -> SymbolsGrid -> Int -> Int -> IO ()
 putSymbolsGrid origin gridSymbols gridSize cellSize = do
-  sequence_ [putSymbolsRow rowPositions rowSymbols | (rowPositions, rowSymbols) <- zip gridPositions gridSymbols]
+    sequence_ [putSymbolsRow rowPositions rowSymbols | (rowPositions, rowSymbols) <- zip gridPositions gridSymbols]
   where
     gridPositions = positionsForGrid origin gridSize cellSize
 
 putLine :: Int -> [Int] -> (Position -> IO ()) -> IO ()
 putLine coord offsets fn = do
-  sequence_ [fn (offsetCoord, coord) | offsetCoord <- offsets]
+    sequence_ [fn (offsetCoord, coord) | offsetCoord <- offsets]
 
 putTicTacToeGrid :: Int -> Int -> Position -> SymbolsGrid -> IO ()
 putTicTacToeGrid cellSize gridSize origin gridSymbols = do
-  sequence_ [putLine (originX + dx * cellSize) hOffsets putHLine | dx <- gridLines]
-  sequence_ [putLine (originY + dy * cellSize) vOffsets putVLine | dy <- gridLines]
-  putSymbolsGrid origin gridSymbols gridSize cellSize
-  goto (0, 0)
+    sequence_ [putLine (originX + dx * cellSize) hOffsets putHLine | dx <- gridLines]
+    sequence_ [putLine (originY + dy * cellSize) vOffsets putVLine | dy <- gridLines]
+    putSymbolsGrid origin gridSymbols gridSize cellSize
+    goto (0, 0)
   where
     originX = fst origin
     originY = snd origin
@@ -92,26 +92,26 @@ putTicTacToeGrid cellSize gridSize origin gridSymbols = do
 -- TODO : Fix this to be correct
 moveGrid' :: Position -> IO ()
 moveGrid' (x, y) = do
-  threadDelay 20000
-  clearScn
-  putTicTacToeGrid 5 3 (x, y) [[O, O, X], [X, X, O], [X, B, X]]
-  goto (0, 0)
+    threadDelay 20000
+    clearScn
+    putTicTacToeGrid 5 3 (x, y) [[O, O, X], [X, X, O], [X, B, X]]
+    goto (0, 0)
 
 moveGrid :: Position -> Position -> IO ()
 moveGrid origin dest = do
-  if (fst origin /= fst dest) && (snd origin /= snd dest)
-    then do
-      if (fst dest < fst origin) || (snd dest < snd origin)
+    if (fst origin /= fst dest) && (snd origin /= snd dest)
         then do
-          sequence_ [moveGrid' (x, y) | (x, y) <- zip (reverse inversePathX) (reverse inversePathY)]
+            if (fst dest < fst origin) || (snd dest < snd origin)
+                then do
+                    sequence_ [moveGrid' (x, y) | (x, y) <- zip (reverse inversePathX) (reverse inversePathY)]
+                else do
+                    sequence_ [moveGrid' (x, y) | (x, y) <- zip pathX pathY]
         else do
-          sequence_ [moveGrid' (x, y) | (x, y) <- zip pathX pathY]
-    else do
-      if (fst dest < fst origin) || (snd dest < snd origin)
-        then do
-          sequence_ [moveGrid' (x, y) | x <- reverse inversePathX, y <- reverse inversePathY]
-        else do
-          sequence_ [moveGrid' (x, y) | x <- pathX, y <- pathY]
+            if (fst dest < fst origin) || (snd dest < snd origin)
+                then do
+                    sequence_ [moveGrid' (x, y) | x <- reverse inversePathX, y <- reverse inversePathY]
+                else do
+                    sequence_ [moveGrid' (x, y) | x <- pathX, y <- pathY]
   where
     pathX = [fst origin .. fst dest]
     pathY = [snd origin .. snd dest]
@@ -154,9 +154,9 @@ gametree grid symbol = Node grid [gametree node (next symbol) | node <- moves gr
 
 moves :: SymbolsGrid -> Symbol -> [SymbolsGrid]
 moves grid symbol
-  | won grid = []
-  | full grid = []
-  | otherwise = concat [move grid index symbol | index <- [0 .. ((gridSize ^ 2) - 1)]]
+    | won grid = []
+    | full grid = []
+    | otherwise = concat [move grid index symbol | index <- [0 .. ((gridSize ^ 2) - 1)]]
 
 prune :: Int -> GameTree t -> GameTree t
 prune 0 (Node x _) = Node x []
@@ -164,13 +164,13 @@ prune n (Node x ts) = Node x [prune (n - 1) t | t <- ts]
 
 minimax :: GameTree SymbolsGrid -> GameTree (SymbolsGrid, Symbol)
 minimax (Node grid [])
-  | wins O grid = Node (grid, O) []
-  | wins X grid = Node (grid, X) []
-  | otherwise = Node (grid, B) []
+    | wins O grid = Node (grid, O) []
+    | wins X grid = Node (grid, X) []
+    | otherwise = Node (grid, B) []
 minimax (Node grid subTrees)
-  | turn grid == O = Node (grid, minimum subTreeSymbols) subtree
-  | turn grid == X = Node (grid, maximum subTreeSymbols) subtree
-  | otherwise = Node ([], B) [] -- We really don't care about this branch but it's there for the sake of pattern exhaustion
+    | turn grid == O = Node (grid, minimum subTreeSymbols) subtree
+    | turn grid == X = Node (grid, maximum subTreeSymbols) subtree
+    | otherwise = Node ([], B) [] -- We really don't care about this branch but it's there for the sake of pattern exhaustion
   where
     subtree = map minimax subTrees
     subTreeSymbols = [symbol | Node (_, symbol) _ <- subtree]
@@ -187,11 +187,11 @@ bestmove grid symbol = bestMoves
 
 positionsOf :: Symbol -> SymbolsMap -> PositionsGrid
 positionsOf symbol symbolMap = do
-  [map snd (filter (\(sym, position) -> sym == symbol) element) | element <- symbolMap]
+    [map snd (filter (\(sym, position) -> sym == symbol) element) | element <- symbolMap]
 
 symbolsOf :: Position -> SymbolsMap -> SymbolsGrid
 symbolsOf position symbolMap = do
-  [map fst (filter (\(symbol, pos) -> pos == position) element) | element <- symbolMap]
+    [map fst (filter (\(symbol, pos) -> pos == position) element) | element <- symbolMap]
 
 -- getBlankGrid :: SymbolsGrid -> SymbolsMap
 -- getBlankGrid grid = do
@@ -243,8 +243,8 @@ fromSymbol B = "  "
 
 playerInOrder :: (Players, Players) -> Symbol
 playerInOrder order
-  | fst order == Human = O
-  | otherwise = X
+    | fst order == Human = O
+    | otherwise = X
 
 putGrid :: SymbolsGrid -> IO ()
 putGrid = putTicTacToeGrid cellSize gridSize origin
@@ -263,50 +263,50 @@ chop n xs = take n xs : chop n (drop n xs)
 
 processInput :: IO Int
 processInput = do
-  input <- readLine'
-  return 0
+    input <- readLine'
+    return 0
 
 prompt :: Symbol -> String
 prompt p = "Player " ++ show p ++ ", enter your move: "
 
 getNat :: String -> IO Int
 getNat prompt = do
-  printMsg prompt
-  xs <- getLine
-  if xs /= [] && all isDigit xs
-    then return (read xs)
-    else do
-      putStrLn "ERROR: Invalid number"
-      getNat prompt
+    printMsg prompt
+    xs <- getLine
+    if xs /= [] && all isDigit xs
+        then return (read xs)
+        else do
+            putStrLn "ERROR: Invalid number"
+            getNat prompt
 
 run :: Strategy -> SymbolsGrid -> Symbol -> Players -> WinCondition -> IO ()
 run strategy g p player condition = do
-  -- Reset screen
-  clearScn
-  goto (0, 0)
-  putGrid g
-  run' strategy g p player condition
+    -- Reset screen
+    clearScn
+    goto (0, 0)
+    putGrid g
+    run' strategy g p player condition
 
 run' :: Strategy -> SymbolsGrid -> Symbol -> Players -> WinCondition -> IO ()
 run' strategy g p player condition
-  | condition O g = printMsg "Player O wins!\n"
-  | condition X g = printMsg "Player X wins!\n"
-  | full g = printMsg "It's a draw!\n"
-  | player == Human = do
-      turn <- getNat (prompt p)
-      case move g turn p of
-        [] -> do
-          run' strategy g p (nextPlayer player) condition
-        g' -> do
-          run strategy (head g') (next p) (nextPlayer player) condition
-  | player == Computer = do
-      putStrLn ("Player " ++ show p ++ " is thinking...")
-      (run strategy $! strategy g p) (next p) (nextPlayer player) condition
+    | condition O g = printMsg "Player O wins!\n"
+    | condition X g = printMsg "Player X wins!\n"
+    | full g = printMsg "It's a draw!\n"
+    | player == Human = do
+        turn <- getNat (prompt p)
+        case move g turn p of
+            [] -> do
+                run' strategy g p (nextPlayer player) condition
+            g' -> do
+                run strategy (head g') (next p) (nextPlayer player) condition
+    | player == Computer = do
+        putStrLn ("Player " ++ show p ++ " is thinking...")
+        (run strategy $! strategy g p) (next p) (nextPlayer player) condition
 
 printMsg :: String -> IO ()
 printMsg msg = do
-  goto (0, 1)
-  putStrLn msg
+    goto (0, 1)
+    putStrLn msg
 
 tictactoe :: Strategy -> Symbol -> Players -> WinCondition -> IO ()
 tictactoe strategy = run strategy empty

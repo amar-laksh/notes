@@ -1,14 +1,14 @@
-module AbstractMachine
-  ( Expr (..),
+module AbstractMachine (
+    Expr (..),
     value',
-  )
+)
 where
 
 data Expr
-  = Val Int
-  | Add Expr Expr
-  | Mult Expr Expr
-  deriving (Show, Eq)
+    = Val Int
+    | Add Expr Expr
+    | Mult Expr Expr
+    deriving (Show, Eq)
 
 data Op = EVALA Expr | EVALM Expr | ADD Int | MULT Int
 

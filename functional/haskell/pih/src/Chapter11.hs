@@ -1,6 +1,6 @@
-module Chapter11
-  ( answers,
-  )
+module Chapter11 (
+    answers,
+)
 where
 
 import Data.List (sortOn)
@@ -19,12 +19,12 @@ maxTreeDepth (Node n ts) = 1 + maximum (map maxTreeDepth ts)
 
 randomMove' :: [SymbolsGrid] -> SymbolsGrid
 randomMove' grid = do
-  let randomIdx = fst (randomR (0, length grid - 1) (mkStdGen 2021))
-  grid !! randomIdx
+    let randomIdx = fst (randomR (0, length grid - 1) (mkStdGen 2021))
+    grid !! randomIdx
 
 randomMove :: Strategy
 randomMove grid symbol = do
-  bestMoves
+    bestMoves
   where
     defaultChoiceGrid = [if s == B then [symbol] else [s] | row <- grid, s <- row]
     bestMoves = randomMove' [node | Node (node, symbol') _ <- trees, symbol' == best]
@@ -33,7 +33,7 @@ randomMove grid symbol = do
 
 quickestRouteToWin :: Strategy
 quickestRouteToWin grid symbol = do
-  bestMoves
+    bestMoves
   where
     defaultChoiceGrid = [if s == B then [symbol] else [s] | row <- grid, s <- row]
     bestMoves = head [node | Node (node, symbol') _ <- trees, symbol' == best]
@@ -43,18 +43,18 @@ quickestRouteToWin grid symbol = do
 
 chooseFirstPlayer :: String -> Symbol
 chooseFirstPlayer choice
-  | choice == "O" = O
-  | choice == "X" = X
-  | otherwise = X
+    | choice == "O" = O
+    | choice == "X" = X
+    | otherwise = X
 
 answers :: IO ()
 answers = do
-  print "*** Chapter 11 exercises ***"
-  -- T.tictactoe stratergy
-  let trees = T.gametree [[B, B, B], [B, B, B], [B, B, B]] X
-  -- print (countNodes trees)
-  -- print (maxTreeDepth trees)
-  -- T.tictactoe randomMove
-  print "choose your player:"
-  choice <- getLine
-  T.tictactoe T.bestmove (chooseFirstPlayer choice) Human T.wins
+    print "*** Chapter 11 exercises ***"
+    -- T.tictactoe stratergy
+    let trees = T.gametree [[B, B, B], [B, B, B], [B, B, B]] X
+    -- print (countNodes trees)
+    -- print (maxTreeDepth trees)
+    -- T.tictactoe randomMove
+    print "choose your player:"
+    choice <- getLine
+    T.tictactoe T.bestmove (chooseFirstPlayer choice) Human T.wins

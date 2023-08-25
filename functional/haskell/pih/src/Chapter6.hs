@@ -1,5 +1,5 @@
-module Chapter6
-  ( sumdown,
+module Chapter6 (
+    sumdown,
     euclid,
     and',
     concat',
@@ -11,7 +11,7 @@ module Chapter6
     msort',
     take',
     zip',
-  )
+)
 where
 
 sumdown :: Int -> Int
@@ -20,9 +20,9 @@ sumdown limit = limit + sumdown (limit - 1)
 
 euclid :: Int -> Int -> Int
 euclid a b
-  | a == b = a
-  | a > b = euclid b (a - b)
-  | otherwise = euclid a (b - a)
+    | a == b = a
+    | a > b = euclid b (a - b)
+    | otherwise = euclid a (b - a)
 
 and' :: [Bool] -> Bool
 and' [] = False
@@ -51,17 +51,17 @@ merge' :: Ord el => [el] -> [el] -> [el]
 merge' a [] = a
 merge' [] b = b
 merge' (a : as) (b : bs)
-  | a >= b = b : merge' (a : as) bs
-  | otherwise = a : merge' as (b : bs)
+    | a >= b = b : merge' (a : as) bs
+    | otherwise = a : merge' as (b : bs)
 
 halve' :: [el] -> ([el], [el])
 halve' [] = ([], [])
 halve' list = do
-  let lengthOfList = length list
-  let tillMiddleOf = lengthOfList `div` 2
-  if even lengthOfList
-    then (take tillMiddleOf list, reverse (fst (halve' (reverse list))))
-    else (head list : fst (halve' (tail list)), snd (halve' (tail list)))
+    let lengthOfList = length list
+    let tillMiddleOf = lengthOfList `div` 2
+    if even lengthOfList
+        then (take tillMiddleOf list, reverse (fst (halve' (reverse list))))
+        else (head list : fst (halve' (tail list)), snd (halve' (tail list)))
 
 msort' :: Ord el => [el] -> [el]
 msort' [] = []

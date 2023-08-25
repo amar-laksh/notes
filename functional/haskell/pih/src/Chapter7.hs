@@ -1,5 +1,5 @@
-module Chapter7
-  ( mapFilter',
+module Chapter7 (
+    mapFilter',
     all',
     any',
     takeWhile',
@@ -18,7 +18,7 @@ module Chapter7
     int2dec',
     numLength',
     findBankCards',
-  )
+)
 where
 
 import qualified BinaryStringTransmitter as BT
@@ -36,14 +36,14 @@ any' p list = or (map p list)
 takeWhile' :: (a -> Bool) -> [a] -> [a]
 takeWhile' _ [] = []
 takeWhile' p (x : xs)
-  | p x = x : takeWhile' p xs
-  | otherwise = [x]
+    | p x = x : takeWhile' p xs
+    | otherwise = [x]
 
 dropWhile' :: (a -> Bool) -> [a] -> [a]
 dropWhile' _ [] = []
 dropWhile' p (x : xs)
-  | p x = dropWhile' p xs
-  | otherwise = xs
+    | p x = dropWhile' p xs
+    | otherwise = xs
 
 mapUsingFoldr' :: (a -> b) -> [a] -> [b]
 mapUsingFoldr' f = foldr (\x xs -> f x : xs) []
@@ -66,13 +66,13 @@ int2dec' :: Int -> [Int]
 int2dec' 0 = []
 int2dec' 1 = [1]
 int2dec' n
-  | n < 0 = error "Negative number handling not implemented"
-  | otherwise =
-    let nextpower = 10 ^ (numLength' n - 1)
-        (q, remainder) = n `quotRem` nextpower
-     in if numLength' n - numLength' remainder > 1
-          then q : 0 : int2dec' (n `mod` nextpower)
-          else q : int2dec' (n `mod` nextpower)
+    | n < 0 = error "Negative number handling not implemented"
+    | otherwise =
+        let nextpower = 10 ^ (numLength' n - 1)
+            (q, remainder) = n `quotRem` nextpower
+         in if numLength' n - numLength' remainder > 1
+                then q : 0 : int2dec' (n `mod` nextpower)
+                else q : int2dec' (n `mod` nextpower)
 
 -- TODO: These only deal with a pair, not tuple
 curry' :: ((a, b) -> c) -> (a -> b -> c)

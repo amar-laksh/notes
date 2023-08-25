@@ -1,18 +1,18 @@
-module TautologyChecker
-  ( Prop (..),
+module TautologyChecker (
+    Prop (..),
     isTaut',
-  )
+)
 where
 
 data Prop
-  = Const Bool
-  | Var Char
-  | Not Prop
-  | And Prop Prop
-  | Or Prop Prop
-  | Eqval Prop Prop
-  | Imply Prop Prop
-  deriving (Show)
+    = Const Bool
+    | Var Char
+    | Not Prop
+    | And Prop Prop
+    | Or Prop Prop
+    | Eqval Prop Prop
+    | Imply Prop Prop
+    deriving (Show)
 
 type Assoc k v = [(k, v)]
 

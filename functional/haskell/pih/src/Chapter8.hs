@@ -1,5 +1,5 @@
-module Chapter8
-  ( mult',
+module Chapter8 (
+    mult',
     nat2int',
     int2nat',
     buildSearchTree',
@@ -15,7 +15,7 @@ module Chapter8
     eval',
     size',
     Expr' (..),
-  )
+)
 where
 
 import qualified Chapter6 as C6
@@ -40,14 +40,14 @@ data BinaryTree a = BinaryLeaf a | BinaryNode (BinaryTree a) (BinaryTree a)
 occurs' :: Ord a => a -> SearchTree a -> Bool
 occurs' node (SearchLeaf leaf) = leaf == node
 occurs' node (SearchNode left root right) = case compare node root of
-  LT -> occurs' node left
-  GT -> occurs' node right
-  EQ -> True
+    LT -> occurs' node left
+    GT -> occurs' node right
+    EQ -> True
 
 listHalves' :: [t] -> ([t], [t])
 listHalves' list = do
-  let listLengthHalf = length list `div` 2
-  (take listLengthHalf list, reverse (take listLengthHalf (reverse list)))
+    let listLengthHalf = length list `div` 2
+    (take listLengthHalf list, reverse (take listLengthHalf (reverse list)))
 
 buildSearchTree' :: [el] -> SearchTree el
 buildSearchTree' [el] = SearchLeaf el
@@ -72,8 +72,8 @@ binaryTreeLeaves' (BinaryNode left right) = binaryTreeLeaves' left + binaryTreeL
 balanced' :: BinaryTree a -> Bool
 balanced' (BinaryLeaf a) = True
 balanced' (BinaryNode left right)
-  | abs (binaryTreeLeaves' left - binaryTreeLeaves' right) <= 1 = True
-  | otherwise = False
+    | abs (binaryTreeLeaves' left - binaryTreeLeaves' right) <= 1 = True
+    | otherwise = False
 
 balance' = buildBinaryTree'
 
@@ -92,15 +92,15 @@ size' = folde' (const 1) (+)
 data Maybe' a = Just' a | Nothing'
 
 instance Eq a => Eq (Maybe' a) where
-  Just' x == Just' y = x == y
-  Nothing' == Nothing' = True
-  _ == _ = False
+    Just' x == Just' y = x == y
+    Nothing' == Nothing' = True
+    _ == _ = False
 
 newtype List' el = List' [el]
 
 instance Eq a => Eq (List' a) where
-  List' [] == List' [] = True
-  List' [_] == List' [] = False
-  List' [] == List' (x : xs) = False
-  List' (x : y : ys) == List' [] = False
-  List' (x : xs) == List' (y : ys) = x == y && xs == ys
+    List' [] == List' [] = True
+    List' [_] == List' [] = False
+    List' [] == List' (x : xs) = False
+    List' (x : y : ys) == List' [] = False
+    List' (x : xs) == List' (y : ys) = x == y && xs == ys

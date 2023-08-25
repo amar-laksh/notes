@@ -1,10 +1,10 @@
-module Chapter2
-  ( lastUsingNthElement,
+module Chapter2 (
+    lastUsingNthElement,
     lastUsingHeadReverse,
     initUsingTake,
     initUsingTailReverse,
     errorMsg,
-  )
+)
 where
 
 errorMsg = "only accepts non-empty list"

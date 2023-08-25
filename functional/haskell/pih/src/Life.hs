@@ -1,5 +1,5 @@
-module Life
-  ( clearScn,
+module Life (
+    clearScn,
     Pos (..),
     Board (..),
     writeAt,
@@ -9,7 +9,7 @@ module Life
     isPrime,
     clearScn,
     printGotos,
-  )
+)
 where
 
 import Control.Concurrent
@@ -37,17 +37,17 @@ clearScn = putStr "\ESC[2J"
 
 writeAt :: Pos -> String -> IO ()
 writeAt position string = do
-  goto' position
-  putStr string
+    goto' position
+    putStr string
 
 goto' :: Pos -> IO ()
 goto' (x, y) = putStr ("\ESC[" ++ show y ++ ";" ++ show x ++ "H")
 
 printGotos :: Int -> Int -> IO ()
 printGotos x y = do
-  goto' (x, y)
-  putChar '*'
-  threadDelay 100
+    goto' (x, y)
+    putChar '*'
+    threadDelay 100
 
 printBoard :: Board -> IO ()
 printBoard board = sequence_ [writeAt position cellShape | position <- board]
@@ -60,17 +60,17 @@ isEmpty board position = not (isAlive board position)
 
 neighbours :: Pos -> [Pos]
 neighbours (x, y) =
-  map
-    wrapAroundEdges
-    [ (x - 1, y + 1),
-      (x, y + 1),
-      (x + 1, y + 1),
-      (x - 1, y),
-      (x + 1, y),
-      (x - 1, y - 1),
-      (x, y - 1),
-      (x + 1, y - 1)
-    ]
+    map
+        wrapAroundEdges
+        [ (x - 1, y + 1)
+        , (x, y + 1)
+        , (x + 1, y + 1)
+        , (x - 1, y)
+        , (x + 1, y)
+        , (x - 1, y - 1)
+        , (x, y - 1)
+        , (x + 1, y - 1)
+        ]
 
 aliveNeighbours :: Board -> Pos -> Int
 aliveNeighbours board = length . filter (isAlive board) . neighbours
@@ -83,8 +83,8 @@ wrapAroundEdges (x, y) = (((x - 1) `mod` width) + 1, ((y - 1) `mod` height) + 1)
 
 birthsFrom :: Board -> Board
 birthsFrom board =
-  [ position | position <- rmdups (concatMap neighbours board), isEmpty board position, aliveNeighbours board position >= 2
-  ]
+    [ position | position <- rmdups (concatMap neighbours board), isEmpty board position, aliveNeighbours board position >= 2
+    ]
 
 survivoursOf :: Board -> Board
 survivoursOf board = [position | position <- board, isAlive board position, aliveNeighbours board position `elem` [1, 2, 4]]
@@ -101,9 +101,9 @@ wait n = sequence_ [return () | _ <- [1 .. n]]
 
 life :: Board -> IO ()
 life board = do
-  clearScn
-  printBoard board
-  wait 50000
-  life (nextGeneration board)
+    clearScn
+    printBoard board
+    wait 50000
+    life (nextGeneration board)
 
 playLife = life initialBoard
