@@ -21,8 +21,8 @@ module Chapter7 (
 )
 where
 
-import qualified BinaryStringTransmitter as BT
-import qualified Chapter4 as C4
+import BinaryStringTransmitter qualified as BT
+import Chapter4 qualified as C4
 
 mapFilter' :: (a -> b) -> (a -> Bool) -> [a] -> [b]
 mapFilter' f p list = map f (filter p list)

@@ -18,7 +18,7 @@ module Chapter8 (
 )
 where
 
-import qualified Chapter6 as C6
+import Chapter6 qualified as C6
 
 data Nat = Zero | Succ Nat
 

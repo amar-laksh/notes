@@ -6,6 +6,10 @@ author:              "Amar Lakshya"
 maintainer:          "example@example.com"
 copyright:           "2022 Amar Lakshya"
 
+default-extensions:
+- ImportQualifiedPost
+- ScopedTypeVariables
+
 extra-source-files:
 - README.md
 - ChangeLog.md
@@ -44,8 +48,6 @@ executables:
     - -Wredundant-constraints
     - -Werror
     - -Wno-type-defaults
-    default-extensions:
-    - ImportQualifiedPost
     dependencies:
     - pih
 
@@ -57,9 +59,6 @@ tests:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    default-extensions:
-    - ScopedTypeVariables
-    - ImportQualifiedPost
     dependencies:
     - pih
     - tasty

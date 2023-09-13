@@ -50,6 +50,9 @@ library
       Paths_pih
   hs-source-dirs:
       src
+  default-extensions:
+      ImportQualifiedPost
+      ScopedTypeVariables
   build-depends:
       base >=4.7 && <5
     , process
@@ -64,6 +67,7 @@ executable pih-exe
       app
   default-extensions:
       ImportQualifiedPost
+      ScopedTypeVariables
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror -Wno-type-defaults
   build-depends:
       base >=4.7 && <5
@@ -80,8 +84,8 @@ test-suite pih-test
   hs-source-dirs:
       test
   default-extensions:
-      ScopedTypeVariables
       ImportQualifiedPost
+      ScopedTypeVariables
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
@@ -102,6 +106,9 @@ benchmark pih-bench
       Paths_pih
   hs-source-dirs:
       bench
+  default-extensions:
+      ImportQualifiedPost
+      ScopedTypeVariables
   ghc-options: -threaded -rtsopts -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror -Wno-type-defaults
   build-depends:
       base >=4.7 && <5
