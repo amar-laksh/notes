@@ -3,18 +3,20 @@ module Main where
 import AbstractMachine qualified as AM
 import Chapter1 qualified as C1
 
-{-import qualified Chapter9 as C9-}
-
 {-import qualified Nim as N-}
 
-import Chapter10 qualified as C10
-import Chapter11 qualified as C11
 import Chapter2 qualified as C2
 import Chapter4 qualified as C4
 import Chapter5 qualified as C5
 import Chapter6 qualified as C6
 import Chapter7 qualified as C7
 import Chapter8 qualified as C8
+
+{-import qualified Chapter9 as C9-}
+import Chapter10 qualified as C10
+
+-- import Chapter11 qualified as C11
+import Chapter12 qualified as C12
 import TautologyChecker qualified as TC
 
 main :: IO ()
@@ -101,7 +103,7 @@ main = do
     print (AM.value' expr')
     -- print (C9.countdowndownApproxSortedSolutions' [2, 3, 4, 5] 100)
 
-    C10.putStr' "hello world"
-    C11.answers
+    C10.putStr' "hello world\n"
+    print (C12.fmap (++ " world") ["hello", "dekho"])
 
--- N.play [2, 0] 1
+-- C11.answers

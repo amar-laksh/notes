@@ -37,6 +37,7 @@ Capabilities	/home/amar/codebases/notes/functional/haskell/pih/src/Term.hs	34;"	
 Chapter1	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter1.hs	1;"	m
 Chapter10	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter10.hs	1;"	m
 Chapter11	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter11.hs	1;"	m
+Chapter12	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter12.hs	1;"	m
 Chapter2	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter2.hs	1;"	m
 Chapter4	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter4.hs	1;"	m
 Chapter5	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter5.hs	1;"	m
@@ -79,9 +80,12 @@ Main	/home/amar/codebases/notes/functional/haskell/pih/app/Main.hs	1;"	m
 Maybe'	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter8.hs	92;"	t
 Mul	/home/amar/codebases/notes/functional/haskell/pih/src/CountdownSolver.hs	17;"	C
 Mult	/home/amar/codebases/notes/functional/haskell/pih/src/AbstractMachine.hs	10;"	C
+MyFunctor	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter12.hs	7;"	c
+MyMaybe	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter12.hs	13;"	t
 Nat	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter8.hs	23;"	t
 Nim	/home/amar/codebases/notes/functional/haskell/pih/src/Nim.hs	1;"	m
 Node	/home/amar/codebases/notes/functional/haskell/pih/src/TicTacToe.hs	136;"	C
+None	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter12.hs	13;"	C
 Not	/home/amar/codebases/notes/functional/haskell/pih/src/TautologyChecker.hs	10;"	C
 Nothing'	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter8.hs	92;"	C
 NumCaps	/home/amar/codebases/notes/functional/haskell/pih/src/Term.hs	29;"	t
@@ -103,6 +107,7 @@ SU	/home/amar/codebases/notes/functional/haskell/pih/src/Term.hs	17;"	C
 SearchLeaf	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter8.hs	36;"	C
 SearchNode	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter8.hs	36;"	C
 SearchTree	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter8.hs	36;"	t
+Some	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter12.hs	13;"	C
 Strategy	/home/amar/codebases/notes/functional/haskell/pih/src/TicTacToe.hs	146;"	t
 Sub	/home/amar/codebases/notes/functional/haskell/pih/src/CountdownSolver.hs	17;"	C
 Succ	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter8.hs	23;"	C
@@ -199,6 +204,7 @@ findBankCards'	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter7.hs
 finished	/home/amar/codebases/notes/functional/haskell/pih/src/Nim.hs	19;"	f
 flattenBinaryTree'	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter8.hs	64;"	f
 flattenSearchTree'	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter8.hs	56;"	f
+fmap	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter12.hs	8;"	f
 folde'	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter8.hs	82;"	f
 fromSymbol	/home/amar/codebases/notes/functional/haskell/pih/src/TicTacToe.hs	239;"	f
 full	/home/amar/codebases/notes/functional/haskell/pih/src/TicTacToe.hs	212;"	f
@@ -244,7 +250,7 @@ luhn	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter4.hs	56;"	f
 luhnDouble	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter4.hs	51;"	f
 luhnUsingAltMap'	/home/amar/codebases/notes/functional/haskell/pih/src/Chapter7.hs	102;"	f
 main	/home/amar/codebases/notes/functional/haskell/pih/Setup.hs	3;"	f
-main	/home/amar/codebases/notes/functional/haskell/pih/app/Main.hs	20;"	f
+main	/home/amar/codebases/notes/functional/haskell/pih/app/Main.hs	22;"	f
 main	/home/amar/codebases/notes/functional/haskell/pih/bench/Bench.hs	9;"	f
 main	/home/amar/codebases/notes/functional/haskell/pih/test/Spec.hs	22;"	f
 make8'	/home/amar/codebases/notes/functional/haskell/pih/src/BinaryStringTransmitter.hs	39;"	f
