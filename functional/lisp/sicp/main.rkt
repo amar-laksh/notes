@@ -1,3 +1,7 @@
+#lang racket
+
 (require "chap1.rkt")
+
 (= (sum-of-squares-largest-two 100 2 13) 10169)
 (= (round (newton-sqrt 121)) 11.0)
+(= (round (newton-cubert 27)) 3.0)
