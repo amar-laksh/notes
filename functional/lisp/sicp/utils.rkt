@@ -1,8 +1,8 @@
 #lang racket
 
-(provide square 
-         cube 
-         head 
+(provide square
+         cube
+         head
          tail)
 
 (define head car)
@@ -11,6 +11,3 @@
 
 (define (square x) (* x x))
 (define (cube x) (* (* x x) x))
-
-
-

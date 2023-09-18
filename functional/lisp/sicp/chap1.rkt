@@ -2,8 +2,8 @@
 
 (require "utils.rkt")
 
-(provide sum-of-squares-largest-two 
-         newton-sqrt 
+(provide sum-of-squares-largest-two
+         newton-sqrt
          newton-cubert)
 
 ;; Exercise 1.3
@@ -11,10 +11,10 @@
 (define (max x y z) (if (greaterThanBoth? x y z) x (if (greaterThanBoth? y x z) y z)))
 (define (is-n-max? x y z n) ( if (= (max x y z) n) true false))
 (define (max-two x y z) (if (is-n-max? x y z x) (list x (max y y z))
-                        (if (is-n-max? x y z y) (list y (max x x z)) (list z (max x y y)))))
+                            (if (is-n-max? x y z y) (list y (max x x z)) (list z (max x y y)))))
 (define (sum-of-squares x y) (+ (square x) (square y)))
 (define (sum-of-squares-largest-two x y z)
-    (sum-of-squares  (head (max-two x y z)) (tail (max-two x y z))))
+  (sum-of-squares  (head (max-two x y z)) (tail (max-two x y z))))
 
 
 (define (good-enough? guess x f) (< (abs (- (f guess) x) ) 0.0001))
