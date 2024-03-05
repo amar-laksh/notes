@@ -16,7 +16,7 @@ import Chapter8 qualified as C8
 import Chapter10 qualified as C10
 
 -- import Chapter11 qualified as C11
-import Chapter12 qualified as C12
+-- import Chapter12 qualified as C12
 import TautologyChecker qualified as TC
 
 main :: IO ()
@@ -104,6 +104,5 @@ main = do
     -- print (C9.countdowndownApproxSortedSolutions' [2, 3, 4, 5] 100)
 
     C10.putStr' "hello world\n"
-    print (C12.fmap (++ " world") ["hello", "dekho"])
 
 -- C11.answers

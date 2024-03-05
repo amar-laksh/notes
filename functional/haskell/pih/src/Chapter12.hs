@@ -1,22 +1,14 @@
 module Chapter12 (
-    Chapter12.fmap,
-    Chapter12.MyMaybe (..),
+    Chapter12.Tree (..),
+    Chapter12.incBT,
 )
 where
 
-class MyFunctor f where
-    fmap :: (a -> b) -> f a -> f b
+data Tree a = Leaf | Node (Tree a) a (Tree a) deriving (Show, Eq, Ord)
 
-instance MyFunctor [] where
-    fmap = map
+instance Functor Tree where
+    fmap f Leaf = Leaf
+    fmap f (Node l o r) = Node (fmap f l) (f o) (fmap f r)
 
-data MyMaybe a = Some a | None
-
-instance Functor MyMaybe where
-    fmap _ None = None
-    fmap f (Some x) = Some (f x)
-
-instance Applicative MyMaybe where
-    pure = Some
-    None <*> _ = None
-    (Some f) <*> g = Prelude.fmap f g
+incBT :: (Functor f, Num n) => n -> f n -> f n
+incBT n = fmap (+ n)

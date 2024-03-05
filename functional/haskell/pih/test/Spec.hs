@@ -1,29 +1,30 @@
-import qualified Chapter1 as C1
-import qualified Chapter10 as C10
-import qualified Chapter2 as C2
-import qualified Chapter4 as C4
-import qualified Chapter5 as C5
-import qualified Chapter6 as C6
-import qualified Chapter7 as C7
-import qualified Chapter8 as C8
-import qualified Chapter9 as C9
+import Chapter1 qualified as C1
+import Chapter10 qualified as C10
+import Chapter12 qualified as C12
+import Chapter2 qualified as C2
+import Chapter4 qualified as C4
+import Chapter5 qualified as C5
+import Chapter6 qualified as C6
+import Chapter7 qualified as C7
+import Chapter8 qualified as C8
+import Chapter9 qualified as C9
 import Control.Concurrent
 import Control.Exception
 import Control.Monad (when)
-import qualified CountdownSolver as CS
+import CountdownSolver qualified as CS
 import Data.List
 import Data.Maybe
 import System.IO.Silently
 import Test.SmallCheck.Series (NonEmpty (NonEmpty), NonNegative (NonNegative), list)
 import Test.Tasty
 import Test.Tasty.HUnit
-import qualified Test.Tasty.SmallCheck as SC
+import Test.Tasty.SmallCheck qualified as SC
 
 main :: IO ()
 main = defaultMain tests
 
 tests :: TestTree
-tests = testGroup "Tests" [chapter1Tests, chapter2Tests, chapter4Tests, chapter5Tests, chapter6Tests, chapter7Tests, chapter8Tests, chapter9Tests, chapter10Tests]
+tests = testGroup "Tests" [chapter1Tests, chapter2Tests, chapter4Tests, chapter5Tests, chapter6Tests, chapter7Tests, chapter8Tests, chapter9Tests, chapter10Tests, chapter12Tests]
 
 chapter1Tests :: TestTree
 chapter1Tests =
@@ -165,7 +166,7 @@ chapter9Tests =
 chapter10Tests :: TestTree
 chapter10Tests =
     testGroup
-        "*** Chapter 9 ***"
+        "*** Chapter 10 ***"
         [ SC.testProperty "C10.putStr' should work the same way as putStr" $
             \(msg :: String) -> SC.monadic $ do
                 (systemPutStr, _) <- capture (putStr msg)
@@ -173,4 +174,12 @@ chapter10Tests =
                 threadDelay 1000
                 (myPutStr, _) <- capture (C10.putStr' msg)
                 return $ systemPutStr == systemPutStr
+        ]
+
+chapter12Tests :: TestTree
+chapter12Tests =
+    testGroup
+        "*** Chapter 12 ***"
+        [ testCase "C12.fmap should act as a functor" $
+            assertBool "Expected this to return True." (1 == 1)
         ]

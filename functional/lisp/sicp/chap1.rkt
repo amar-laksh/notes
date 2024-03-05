@@ -29,3 +29,6 @@
 (define (improveCubert guess x) (/ (+ (/ x (square guess)) (* 2 guess)) 3))
 (define (cubert-iter guess x) ( if (good-enough? guess x cube) guess (cubert-iter (improveCubert guess x) x)))
 (define (newton-cubert x) (cubert-iter 1.0 x))
+
+;; Exercise 1.11
+(define (f_n n)  ( if (< n 3) n  (f_n (- n 1) ) ))
